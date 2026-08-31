@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>纳指100 ETF 场内溢价监控</title>
+<meta name="description" content="沪深场内纳斯达克100 ETF 实时估值、溢价、规模、成立时间与历年业绩对比。">
+<meta name="theme-color" content="#07111f">
+<style>
+:root{
+  --bg:#06101c;--panel:#0b1b2e;--panel2:#10243a;--border:rgba(150,180,205,.14);
+  --text:#edf7ff;--muted:#8298ad;--cyan:#66e3d5;--up:#ff6576;--down:#53d99c;
+  --amber:#f2c274;--blue:#79aaff;--shadow:0 22px 55px rgba(0,0,0,.28)
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,"Microsoft YaHei",system-ui,sans-serif;background:
+radial-gradient(circle at 16% 0,rgba(70,130,190,.16),transparent 34%),
+radial-gradient(circle at 90% 15%,rgba(70,220,200,.08),transparent 30%),
+linear-gradient(180deg,#050d17,#081522 45%,#06101c)}
+button,select{font:inherit}.shell{max-width:1380px;margin:auto;padding:28px 18px 42px}
+.top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px}
+.eyebrow{font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:var(--cyan);font-weight:850;margin-bottom:8px}
+h1{margin:0;font-size:clamp(26px,4vw,42px);letter-spacing:-.03em}
+.sub{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.75;max-width:820px}
+.status{min-width:280px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:rgba(8,22,38,.72)}
+.statusline{display:flex;gap:8px;align-items:center;font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#73879b}
+.dot.live{background:var(--down);box-shadow:0 0 14px rgba(83,217,156,.55)}.dot.warn{background:var(--amber)}
+.status small{display:block;color:var(--muted);margin-top:6px;line-height:1.55}
+.card{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:20px;background:linear-gradient(180deg,rgba(14,32,53,.94),rgba(8,22,38,.91));box-shadow:var(--shadow)}
+.head,.body{position:relative;z-index:1}.head{padding:18px 19px 0;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.head h2{margin:0;font-size:15px}.tag{font-size:10px;color:var(--cyan);font-weight:800;letter-spacing:.06em}
+.body{padding:16px 19px 19px}
+.notice{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px}
+.badge{padding:7px 10px;border:1px solid rgba(151,182,211,.11);border-radius:999px;background:rgba(255,255,255,.02);font-size:10px;color:#90a5b8}
+.badge strong{color:#dce9f3}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.refresh{cursor:pointer;padding:8px 12px;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.025);color:#a6b8c7;font-size:11px;font-weight:760}
+.tableWrap{overflow:auto;margin-top:12px;border-top:1px solid rgba(151,182,211,.08)}
+table{width:100%;border-collapse:collapse;min-width:1240px;font-size:11px}
+th,td{padding:11px 11px;text-align:right;border-bottom:1px solid rgba(151,182,211,.065);white-space:nowrap}
+th{position:sticky;top:0;background:#0b1b2e;color:#8096aa;z-index:3;font-weight:760}
+th:first-child,td:first-child{text-align:left}td{color:#c2d0dc}tbody tr:hover td{background:rgba(255,255,255,.018)}
+.code{font-weight:850;color:#e9f7ff;font-size:12px}.company{color:#9fb2c3}.premium{font-size:14px;font-weight:900}
+.prem-low{color:var(--down)}.prem-mid{color:var(--amber)}.prem-high{color:var(--up)}
+.micro{display:block;color:#697f93;font-size:9px;margin-top:3px;font-weight:500}
+.source-na{color:#78c9ff}.source-hao{color:#c79aff}.source-cache{color:#9aaab8}
+.detailBtn{cursor:pointer;border:1px solid rgba(102,227,213,.16);background:rgba(102,227,213,.055);color:var(--cyan);border-radius:8px;padding:6px 9px;font-size:10px;font-weight:800}
+.empty{padding:35px!important;text-align:center!important;color:#71879a}
+.footer{margin-top:16px;color:#647b90;font-size:10px;line-height:1.8}
+.footer strong{color:#879daf}
+
+.modalBackdrop{display:none;position:fixed;inset:0;z-index:50;background:rgba(2,8,14,.72);backdrop-filter:blur(5px);padding:18px;overflow:auto}
+.modalBackdrop.show{display:block}
+.modal{max-width:1050px;margin:18px auto;border:1px solid rgba(151,182,211,.16);border-radius:20px;background:#081827;box-shadow:0 28px 80px rgba(0,0,0,.5);overflow:hidden}
+.modalHead{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:17px 19px;border-bottom:1px solid rgba(151,182,211,.09)}
+.modalHead h2{margin:0;font-size:18px}.close{cursor:pointer;width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.025);color:#a9bac8}
+.modalBody{padding:18px}
+.metaGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.metric{padding:11px 12px;border:1px solid rgba(151,182,211,.09);border-radius:12px;background:rgba(255,255,255,.018)}
+.metric span{display:block;color:#748ba0;font-size:9px;margin-bottom:5px}.metric strong{font-size:12px}
+.section{margin-top:18px}.sectionTitle{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+.sectionTitle h3{margin:0;font-size:13px}.sectionTitle small{color:#74899d}
+.yearGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.yearBox{padding:11px;border:1px solid rgba(151,182,211,.09);border-radius:11px;background:rgba(255,255,255,.018)}
+.yearBox span{display:block;color:#738a9e;font-size:9px;margin-bottom:5px}.yearBox strong{font-size:14px}
+.monthSelect{padding:8px 10px;border:1px solid var(--border);border-radius:9px;background:#0a1a2c;color:#c8d7e4;font-size:11px}
+.chartWrap{height:270px;position:relative;border:1px solid rgba(151,182,211,.07);border-radius:12px;background:rgba(4,15,27,.35);overflow:hidden}
+canvas{width:100%;height:100%;display:block}
+.histTable{max-height:430px;overflow:auto;margin-top:10px;border:1px solid rgba(151,182,211,.07);border-radius:12px}
+.histTable table{min-width:650px}.up{color:var(--up)!important}.down{color:var(--down)!important}.flat{color:#becbd6!important}
+
+@media(max-width:760px){.metaGrid{grid-template-columns:1fr 1fr}.yearGrid{grid-template-columns:repeat(3,minmax(0,1fr))}.status{width:100%}}
+@media(max-width:480px){.shell{padding:20px 10px 30px}.modalBackdrop{padding:7px}.modalBody{padding:12px}.metaGrid{grid-template-columns:1fr 1fr}.yearGrid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="top">
+  <div>
+    <div class="eyebrow">Nasdaq-100 ETF Premium Monitor</div>
+    <h1>纳指100 ETF 场内溢价监控</h1>
+    <div class="sub">覆盖沪深 12 只标准纳斯达克100 ETF。场内现价与估值必须取自同一平台同一快照，再由本工具自行计算溢价率；默认按溢价率从低到高排列。</div>
+  </div>
+  <div class="status">
+    <div class="statusline"><span id="dot" class="dot"></span><strong id="statusTitle">等待数据</strong></div>
+    <small id="statusSub">正在连接 Cloudflare Worker…</small>
+  </div>
+</header>
+
+<div class="notice">
+  <span class="badge"><strong>主源</strong> naKanban / Tinyright</span>
+  <span class="badge"><strong>整组备用</strong> HaoETF</span>
+  <span class="badge"><strong>历史行情</strong> 东方财富日K</span>
+  <span class="badge"><strong>年度业绩</strong> 基金净值口径</span>
+  <span class="badge"><strong>规模</strong> 截至 2026-06-30</span>
+  <span class="badge"><strong>费率</strong> 管理费 + 托管费</span>
+</div>
+
+<section class="card">
+  <div class="head">
+    <div><h2>12只纳指100 ETF</h2><div class="tag">V1.1 · PREMIUM FIRST · SAME-SOURCE SNAPSHOT</div></div>
+    <button id="refresh" class="refresh">立即刷新</button>
+  </div>
+  <div class="body">
+    <div class="toolbar">
+      <div id="summary" class="sub" style="margin:0">等待实时/最近交易快照…</div>
+      <div id="lastUpdate" class="tag">—</div>
+    </div>
+    <div class="tableWrap">
+      <table>
+        <thead><tr>
+          <th>代码</th>
+          <th>公司</th>
+          <th>溢价率</th>
+          <th>场内现价</th>
+          <th>实时估值</th>
+          <th>规模</th>
+          <th>费率</th>
+          <th>成立时间</th>
+          <th>运行年限</th>
+          <th>年度业绩</th>
+        </tr></thead>
+        <tbody id="tbody"><tr><td colspan="10" class="empty">正在读取数据…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  <strong>口径说明：</strong>交易时段优先显示同一平台同一时点的场内价格与实时估值；非交易时间显示最近有效交易快照。
+  Tinyright 数据异常时，只对能够取得完整同源快照的产品整组切换 HaoETF，绝不把两个平台的“价格”和“估值”拼接计算。
+  第三方实时估值不是交易所官方 IOPV。基金规模为最近一期披露净资产规模；“费率”为基金管理费率+托管费率的年化合计，不包含券商二级市场交易佣金；年度业绩按基金净值日收益复合计算。均仅供研究参考，不构成投资建议。
+</div>
+</main>
+
+<div id="modal" class="modalBackdrop">
+  <div class="modal">
+    <div class="modalHead"><h2 id="modalTitle">ETF详情</h2><button id="closeModal" class="close">×</button></div>
+    <div class="modalBody">
+      <div id="metaGrid" class="metaGrid"></div>
+
+      <div class="section">
+        <div class="sectionTitle">
+          <h3>产品运行年度业绩</h3>
+          <small id="annualSource">净值口径 · 正在加载</small>
+        </div>
+        <div id="annualGrid" class="yearGrid"><div class="empty" style="grid-column:1/-1">正在加载年度业绩…</div></div>
+      </div>
+
+      <div class="section">
+        <div class="sectionTitle">
+          <div><h3>历史场内行情</h3><small>选择月份后只展示该月每个交易日</small></div>
+          <select id="monthSelect" class="monthSelect"></select>
+        </div>
+        <div class="chartWrap"><canvas id="histChart"></canvas></div>
+        <div class="histTable">
+          <table>
+            <thead><tr><th>日期</th><th>收盘</th><th>涨跌幅</th><th>开盘</th><th>最高</th><th>最低</th></tr></thead>
+            <tbody id="histBody"><tr><td colspan="6" class="empty">请选择产品</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(()=>{
+"use strict";
+
+const WORKER_BASE="https://wispy-forest-31d0.jyl1347433293.workers.dev";
+const LOCAL_KEY="nasdaq100_etf_last_good_v1_1";
+const $=id=>document.getElementById(id);
+let rows=[],selected=null,refreshTimer=null,hist=[];
+
+const num=v=>Number.isFinite(Number(v))?Number(v):null;
+const price=v=>num(v)==null?"—":Number(v).toFixed(4);
+const pct=v=>num(v)==null?"—":`${Number(v)>0?"+":""}${Number(v).toFixed(2)}%`;
+const feePct=v=>num(v)==null?"—":`${Number(v).toFixed(2)}%`;
+const cssPct=v=>num(v)==null||Math.abs(Number(v))<1e-12?"flat":Number(v)>0?"up":"down";
+
+function yearsSince(dateStr){
+  const a=new Date(dateStr+"T00:00:00"),b=new Date();
+  const years=(b-a)/(365.2425*86400000);
+  return Math.max(0,years).toFixed(1)+" 年";
+}
+
+function premiumClass(v){
+  if(!Number.isFinite(Number(v)))return"";
+  const x=Number(v);
+  if(x<5)return"prem-low";
+  if(x<10)return"prem-mid";
+  return"prem-high";
+}
+
+function sourceClass(s){
+  if(s==="naKanban")return"source-na";
+  if(s==="HaoETF")return"source-hao";
+  return"source-cache";
+}
+
+function sourceLabel(r){
+  if(r.dataStatus==="cached")return`${r.source||"历史"} · 最近有效快照`;
+  if(r.source==="HaoETF")return"HaoETF 备用";
+  if(r.source==="naKanban")return"naKanban";
+  return"暂无";
+}
+
+function freshnessLabel(r){
+  if(r.dataStatus==="cached"){
+    if(Number.isFinite(Number(r.cacheAgeMinutes))) return `缓存 ${r.cacheAgeMinutes} 分钟前`;
+    return "最近有效缓存";
+  }
+  if(r.freshness==="live")return"实时";
+  if(r.freshness==="recent")return`约 ${r.ageMinutes} 分钟前`;
+  if(r.freshness==="stale")return`较旧 · ${r.ageMinutes} 分钟前`;
+  return"时间未知";
+}
+
+function saveLocal(){
+  try{
+    const obj={};
+    rows.forEach(r=>{
+      if(Number.isFinite(Number(r.price))&&Number.isFinite(Number(r.estimate))&&Number.isFinite(Number(r.premium))){
+        obj[r.code]=r;
+      }
+    });
+    localStorage.setItem(LOCAL_KEY,JSON.stringify(obj));
+  }catch(_){}
+}
+
+function loadLocal(){
+  try{return JSON.parse(localStorage.getItem(LOCAL_KEY)||"{}")}catch(_){return{}}
+}
+
+function mergeLocal(apiRows){
+  const local=loadLocal();
+  return apiRows.map(r=>{
+    if(Number.isFinite(Number(r.premium)))return r;
+    const old=local[r.code];
+    if(old&&Number.isFinite(Number(old.premium))){
+      return {...r,...old,dataStatus:"cached",company:r.company,size:r.size,sizeDate:r.sizeDate,inception:r.inception,managementFee:r.managementFee,custodyFee:r.custodyFee,totalFee:r.totalFee};
+    }
+    return r;
+  });
+}
+
+async function api(path,timeout=9000){
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),timeout);
+  try{
+    const res=await fetch(WORKER_BASE+path,{cache:"no-store",signal:ctl.signal});
+    const j=await res.json().catch(()=>null);
+    if(!res.ok||!j||j.ok===false)throw new Error(j?.error||`HTTP ${res.status}`);
+    return j;
+  }finally{clearTimeout(t)}
+}
+
+function render(){
+  const sorted=[...rows].sort((a,b)=>{
+    const av=num(a.premium),bv=num(b.premium);
+    if(av===null&&bv===null)return a.code.localeCompare(b.code);
+    if(av===null)return 1;if(bv===null)return-1;
+    return av-bv;
+  });
+
+  $("tbody").innerHTML=sorted.map(r=>{
+    const prem=num(r.premium);
+    return `<tr>
+      <td><span class="code">${r.code}</span><span class="micro">${r.name||"纳指100ETF"}</span></td>
+      <td><span class="company">${r.company}</span></td>
+      <td><span class="premium ${premiumClass(prem)}">${pct(prem)}</span><span class="micro ${sourceClass(r.source)}">${sourceLabel(r)} · ${freshnessLabel(r)}<br>${r.snapshotTime||"时间未知"}</span></td>
+      <td>${price(r.price)}</td>
+      <td>${price(r.estimate)}</td>
+      <td>${Number(r.size).toFixed(2)} 亿<span class="micro">${r.sizeDate}</span></td>
+      <td><strong>${feePct(r.totalFee)}/年</strong><span class="micro">管理 ${feePct(r.managementFee)} + 托管 ${feePct(r.custodyFee)}</span></td>
+      <td>${r.inception}</td>
+      <td>${yearsSince(r.inception)}</td>
+      <td><button class="detailBtn" data-code="${r.code}">查看业绩</button></td>
+    </tr>`;
+  }).join("");
+
+  document.querySelectorAll(".detailBtn").forEach(b=>b.onclick=()=>openDetail(b.dataset.code));
+
+  const usable=sorted.filter(r=>Number.isFinite(Number(r.premium)));
+  const fallback=sorted.filter(r=>r.source==="HaoETF"&&r.dataStatus!=="cached").length;
+  const cached=sorted.filter(r=>r.dataStatus==="cached").length;
+  $("summary").textContent=`有效 ${usable.length}/12 只${fallback?` · HaoETF备用 ${fallback} 只`:""}${cached?` · 最近快照 ${cached} 只`:""}`;
+}
+
+async function loadPremiums(){
+  $("dot").className="dot";
+  $("statusTitle").textContent="正在刷新";
+  $("statusSub").textContent="读取12只ETF同源价格与估值快照…";
+
+  try{
+    const j=await api("/api/premiums");
+    rows=mergeLocal(j.rows||[]);
+    saveLocal();
+    render();
+
+    const open=j.marketOpen===true;
+    $("dot").className="dot "+(open?"live":"warn");
+    $("statusTitle").textContent=open?"A股交易时段 · 动态更新":"A股非交易时段 · 最近有效快照";
+    $("statusSub").textContent=open
+      ?"交易时段每15秒刷新；若主源单只数据异常，会整组切换备用源。"
+      :"非交易时段降低刷新频率，显示来源提供的最近交易数据或最近有效缓存。";
+    $("lastUpdate").textContent=new Date(j.generatedAt).toLocaleString("zh-CN",{hour12:false});
+
+    clearInterval(refreshTimer);
+    refreshTimer=setInterval(()=>{if(!document.hidden)loadPremiums()},open?15000:300000);
+  }catch(e){
+    console.error(e);
+    const local=loadLocal();
+    if(Object.keys(local).length){
+      rows=Object.values(local);render();
+      $("statusTitle").textContent="实时源暂不可用";
+      $("statusSub").textContent="当前显示本浏览器保存的最近有效快照。";
+    }else{
+      $("tbody").innerHTML='<tr><td colspan="10" class="empty">实时数据读取失败，请检查 Worker 是否已部署为新版。</td></tr>';
+      $("statusTitle").textContent="数据读取失败";
+      $("statusSub").textContent=e.message||"Worker不可用";
+    }
+    $("dot").className="dot warn";
+  }
+}
+
+function buildMonths(inception){
+  const sel=$("monthSelect"),now=new Date(),start=new Date(inception+"T00:00:00");
+  let html="";
+  for(let y=now.getFullYear();y>=start.getFullYear();y--){
+    const sm=y===now.getFullYear()?now.getMonth()+1:12;
+    const em=y===start.getFullYear()?start.getMonth()+1:1;
+    for(let m=sm;m>=em;m--){
+      const mm=String(m).padStart(2,"0");
+      html+=`<option value="${y}-${mm}">${y}年${m}月</option>`;
+    }
+  }
+  sel.innerHTML=html;
+}
+
+function modalMeta(r){
+  return [
+    ["代码",r.code],["基金公司",r.company],["当前溢价",pct(r.premium)],["当前快照来源",sourceLabel(r)],
+    ["场内现价",price(r.price)],["实时估值",price(r.estimate)],["规模",`${Number(r.size).toFixed(2)}亿元`],["费率",`${feePct(r.totalFee)}/年（管理${feePct(r.managementFee)} + 托管${feePct(r.custodyFee)}）`],
+    ["成立时间",r.inception],["运行年限",yearsSince(r.inception)]
+  ].map(([a,b])=>`<div class="metric"><span>${a}</span><strong>${b}</strong></div>`).join("");
+}
+
+async function openDetail(code){
+  selected=rows.find(r=>r.code===code);
+  if(!selected)return;
+  $("modal").classList.add("show");
+  $("modalTitle").textContent=`${selected.code} · ${selected.company} 纳指100ETF`;
+  $("metaGrid").innerHTML=modalMeta(selected);
+  buildMonths(selected.inception);
+  $("annualGrid").innerHTML='<div class="empty" style="grid-column:1/-1">正在加载年度业绩…</div>';
+  $("annualSource").textContent="基金净值口径 · 正在加载";
+  await Promise.allSettled([loadAnnual(code),loadMonthHistory(code,$("monthSelect").value)]);
+}
+
+async function loadAnnual(code){
+  try{
+    const j=await api(`/api/annual?code=${encodeURIComponent(code)}`,12000);
+    $("annualSource").textContent=j.source||"基金净值口径";
+    const ys=j.years||[];
+    $("annualGrid").innerHTML=ys.length?ys.map(y=>`<div class="yearBox"><span>${y.label}</span><strong class="${cssPct(y.returnPct)}">${pct(y.returnPct)}</strong></div>`).join("")
+      :'<div class="empty" style="grid-column:1/-1">暂无年度业绩</div>';
+  }catch(e){
+    console.error(e);
+    $("annualSource").textContent="年度净值数据暂不可用";
+    $("annualGrid").innerHTML='<div class="empty" style="grid-column:1/-1">年度业绩读取失败，不影响实时溢价和历史场内行情。</div>';
+  }
+}
+
+let cbCount=0;
+function jsonp(url,timeout=7000){
+  return new Promise((ok,bad)=>{
+    const cb="__ndxetf"+Date.now()+"_"+(++cbCount),sc=document.createElement("script"),sep=url.includes("?")?"&":"?";
+    let done=false;
+    const clean=()=>{sc.remove();try{delete window[cb]}catch(_){window[cb]=undefined}};
+    const t=setTimeout(()=>{if(done)return;done=true;clean();bad(new Error("timeout"))},timeout);
+    window[cb]=x=>{if(done)return;done=true;clearTimeout(t);clean();ok(x)};
+    sc.onerror=()=>{if(done)return;done=true;clearTimeout(t);clean();bad(new Error("history error"))};
+    sc.src=url+sep+"cb="+cb+"&_="+Date.now();document.head.appendChild(sc);
+  });
+}
+
+async function loadMonthHistory(code,ym){
+  $("histBody").innerHTML='<tr><td colspan="6" class="empty">正在加载该月历史行情…</td></tr>';
+  hist=[];drawHist();
+  const [y,m]=ym.split("-").map(Number),last=new Date(y,m,0).getDate();
+  const beg=`${y}${String(m).padStart(2,"0")}01`;
+  const end=`${y}${String(m).padStart(2,"0")}${String(last).padStart(2,"0")}`;
+  const secid=(code.startsWith("5")?"1.":"0.")+code;
+  const path=`https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=${secid}&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&klt=101&fqt=0&beg=${beg}&end=${end}&lmt=40&ut=7eea3edcaed734bea9cbfc24409ed989`;
+  try{
+    const j=await jsonp(path),ks=j?.data?.klines;
+    if(!Array.isArray(ks)||!ks.length)throw new Error("empty");
+    hist=ks.map(s=>{
+      const a=String(s).split(",");
+      return{date:a[0],open:num(a[1]),close:num(a[2]),high:num(a[3]),low:num(a[4]),pct:num(a[8])};
+    });
+    $("histBody").innerHTML=hist.slice().reverse().map(d=>`<tr><td>${d.date}</td><td>${price(d.close)}</td><td class="${cssPct(d.pct)}">${pct(d.pct)}</td><td>${price(d.open)}</td><td>${price(d.high)}</td><td>${price(d.low)}</td></tr>`).join("");
+    drawHist();
+  }catch(e){
+    console.error(e);
+    $("histBody").innerHTML='<tr><td colspan="6" class="empty">该月份历史行情暂不可用。</td></tr>';
+    drawHist();
+  }
+}
+
+function drawHist(){
+  const c=$("histChart"),wrap=c.parentElement,r=wrap.getBoundingClientRect(),W=Math.max(300,r.width),H=Math.max(220,r.height),dpr=Math.min(2,window.devicePixelRatio||1);
+  c.width=W*dpr;c.height=H*dpr;c.style.width=W+"px";c.style.height=H+"px";
+  const x=c.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
+  if(!hist.length){x.fillStyle="rgba(150,175,198,.55)";x.font="12px sans-serif";x.textAlign="center";x.fillText("等待历史行情",W/2,H/2);return}
+  const p={l:54,r:18,t:20,b:36},PW=W-p.l-p.r,PH=H-p.t-p.b,vals=hist.map(d=>d.close),mn=Math.min(...vals),mx=Math.max(...vals),pd=Math.max((mx-mn)*.15,mx*.006),lo=mn-pd,hi=mx+pd;
+  const X=i=>p.l+(hist.length===1?PW/2:PW*i/(hist.length-1)),Y=v=>p.t+(hi-v)/(hi-lo||1)*PH;
+  x.font="10px sans-serif";x.textBaseline="middle";
+  for(let i=0;i<4;i++){const v=lo+(hi-lo)*i/3,y=Y(v);x.beginPath();x.strokeStyle="rgba(145,174,201,.08)";x.moveTo(p.l,y);x.lineTo(W-p.r,y);x.stroke();x.fillStyle="rgba(154,177,199,.65)";x.textAlign="right";x.fillText(v.toFixed(3),p.l-7,y)}
+  x.beginPath();hist.forEach((d,i)=>i?x.lineTo(X(i),Y(d.close)):x.moveTo(X(i),Y(d.close)));x.strokeStyle="#66e3d5";x.lineWidth=2;x.stroke();
+  const step=Math.max(1,Math.ceil(hist.length/(W<600?4:7)));hist.forEach((d,i)=>{if(i%step===0||i===hist.length-1){x.fillStyle="rgba(154,177,199,.63)";x.textAlign="center";x.fillText(d.date.slice(5),X(i),H-17)}})
+}
+
+$("refresh").onclick=loadPremiums;
+$("closeModal").onclick=()=>$("modal").classList.remove("show");
+$("modal").onclick=e=>{if(e.target===$("modal"))$("modal").classList.remove("show")};
+$("monthSelect").onchange=()=>{if(selected)loadMonthHistory(selected.code,$("monthSelect").value)};
+window.addEventListener("resize",drawHist);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)loadPremiums()});
+
+loadPremiums();
+})();
+</script>
+</body>
+</html>
