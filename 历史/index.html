@@ -87,17 +87,32 @@ h1{margin:0;font-size:clamp(26px,4vw,42px);letter-spacing:-.03em}
   }
 }
 
-.otcTable{
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior-x:contain
+.otcTable{overflow-x:hidden}
+.otcTable table{
+  width:100%;
+  min-width:0;
+  table-layout:fixed;
+  font-size:10px
 }
-.otcTable table{table-layout:auto}
 .otcTable th,.otcTable td{
-  padding:11px 10px;
-  overflow:visible;
-  text-overflow:clip
+  padding:9px 5px;
+  overflow:hidden;
+  text-overflow:ellipsis
 }
+.otcTable th:nth-child(1),.otcTable td:nth-child(1){width:4.5%}
+.otcTable th:nth-child(2),.otcTable td:nth-child(2){width:11%;white-space:normal;line-height:1.28}
+.otcTable th:nth-child(3),.otcTable td:nth-child(3){width:6%}
+.otcTable th:nth-child(4),.otcTable td:nth-child(4){width:6%}
+.otcTable th:nth-child(5),.otcTable td:nth-child(5){width:3.5%}
+.otcTable th:nth-child(6),.otcTable td:nth-child(6){width:5.5%}
+.otcTable th:nth-child(7),.otcTable td:nth-child(7){width:7%}
+.otcTable th:nth-child(8),.otcTable td:nth-child(8){width:7%}
+.otcTable th:nth-child(9),.otcTable td:nth-child(9){width:8.5%;white-space:normal;line-height:1.25}
+.otcTable th:nth-child(10),.otcTable td:nth-child(10){width:5%}
+.otcTable th:nth-child(11),.otcTable td:nth-child(11){width:8.5%;white-space:normal;line-height:1.25}
+.otcTable th:nth-child(12),.otcTable td:nth-child(12){width:6.5%}
+.otcTable th:nth-child(13),.otcTable td:nth-child(13){width:6.5%;white-space:normal}
+.otcTable th:nth-child(14),.otcTable td:nth-child(14){width:14.5%;white-space:normal}
 .otcTable .company{display:block;overflow-wrap:anywhere}
 .otcTable td:nth-child(2) .company{
   font-weight:850;
@@ -247,11 +262,11 @@ h1{margin:0;font-size:clamp(26px,4vw,42px);letter-spacing:-.03em}
 table{width:100%;border-collapse:collapse;min-width:1240px;font-size:11px}
 th,td{padding:11px 11px;text-align:right;border-bottom:1px solid rgba(151,182,211,.065);white-space:nowrap}
 th{position:sticky;top:0;background:#0b1b2e;color:#8096aa;z-index:3;font-weight:760}
-th.sortable,th.otcSortable{cursor:pointer;user-select:none;transition:color .15s ease,background .15s ease}
-th.sortable:hover,th.otcSortable:hover{color:#d7e5f0;background:#10243a}
-th.sortable .sortMark,th.otcSortable .sortMark{display:inline-block;min-width:12px;margin-left:4px;color:#5e7589;font-size:9px}
-th.sortable.active,th.otcSortable.active{color:#dcebf6}
-th.sortable.active .sortMark,th.otcSortable.active .sortMark{color:var(--cyan)}
+th.sortable{cursor:pointer;user-select:none;transition:color .15s ease,background .15s ease}
+th.sortable:hover{color:#d7e5f0;background:#10243a}
+th.sortable .sortMark{display:inline-block;min-width:12px;margin-left:4px;color:#5e7589;font-size:9px}
+th.sortable.active{color:#dcebf6}
+th.sortable.active .sortMark{color:var(--cyan)}
 
 th:first-child,td:first-child{text-align:left}td{color:#c2d0dc}tbody tr:hover td{background:rgba(255,255,255,.018)}
 .code{font-weight:850;color:#e9f7ff;font-size:12px}.company{color:#9fb2c3}.premium{font-size:14px;font-weight:900}
@@ -335,7 +350,7 @@ canvas{width:100%;height:100%;display:block}
 
 <section id="etfCard" class="card">
   <div class="head">
-    <div><h2>12只纳指100 ETF</h2><div class="tag">V3.28 · OTC D1 DAILY CACHE · RESPONSIVE TABLE</div></div>
+    <div><h2>12只纳指100 ETF</h2><div class="tag">V2.35 · QQQ FULL ANNUAL HISTORY</div></div>
     <button id="refresh" class="refresh">立即刷新</button>
   </div>
   <div class="body">
@@ -374,11 +389,11 @@ canvas{width:100%;height:100%;display:block}
   </div>
   <div class="body">
     <div class="toolbar">
-      <div id="otcSummary" class="sub" style="margin:0">正在优先读取最近有效额度；缓存过期后由 Worker 后台检查公告更新…</div>
+      <div id="otcSummary" class="sub" style="margin:0">每次打开网页会后台刷新一次额度并检查公告更新…</div>
       <div id="otcLastUpdate" class="tag">—</div>
     </div>
     <div class="otcNote">
-      一行对应一个场外基金份额。网页优先显示最近有效数据；额度缓存过期后由 Worker 在后台刷新，并检查基金产品及特殊份额是否出现新的额度公告。
+      一行对应一个人民币场外基金份额。每次打开网页会刷新当前额度，并检查基金产品及特殊份额是否出现新的额度公告。
       新公告若尚未到生效日，只显示未来生效预警，不提前改变当前额度；仍无法完成校验（包括“部分验证”）的产品会按需继续向后查找历史有效公告。
       “年运作费”=管理费+托管费+销售服务费。默认以基金公司内最高可用额度作为公司排序权重，同一公司的所有份额保持相邻；直销额度未单独披露时默认按代销额度显示。
     </div>
@@ -482,7 +497,7 @@ canvas{width:100%;height:100%;display:block}
 </section>
 
 <div class="footer">
-  <strong>口径说明：</strong>人民币场外QDII当前额度以安鑫乐跨境额度日报为主数据；基金管理人公告作为独立校验和提前预警源。网页优先读取最近有效缓存；缓存过期时先显示旧数据并由 Worker 后台更新17个基金主代码及8个D/E/F/I特殊人民币份额代码的额度相关公告列表；点击“刷新额度与公告”可主动等待完整刷新。若仍无法验证，仅对未验证基金按需向后翻历史公告。美元份额仅保留广发基金 000055 / 006480 两个份额。美元份额未包含在人民币额度日报中，因此其申购状态和额度由基金管理人额度公告独立解析；公告明确以“美元”披露申购限额时才显示美元额度，未明确时不把人民币数字换算或套用为美元额度。场外费率详情读取天天基金/东方财富Choice费率页面；场外净值、净值历史和年度业绩读取基金净值走势数据，年度业绩按基金净值日收益复合计算；年化跟踪误差恢复使用天天基金/东方财富基金特色数据的当前年化跟踪误差口径。实际可申购额度及费率仍以下单渠道及基金管理人最新公告为准。<br>
+  <strong>口径说明：</strong>人民币场外QDII当前额度以安鑫乐跨境额度日报为主数据；基金管理人公告作为独立校验和提前预警源。网页每次打开会重新读取人民币当前额度，并检查17个基金主代码及8个D/E/F/I特殊人民币份额代码的额度相关公告列表；若仍无法验证，仅对未验证基金按需向后翻历史公告。美元份额仅保留广发基金 000055 / 006480 两个份额。美元份额未包含在人民币额度日报中，因此其申购状态和额度由基金管理人额度公告独立解析；公告明确以“美元”披露申购限额时才显示美元额度，未明确时不把人民币数字换算或套用为美元额度。场外费率详情读取天天基金/东方财富Choice费率页面；场外净值、净值历史和年度业绩读取基金净值走势数据，年度业绩按基金净值日收益复合计算；年化跟踪误差恢复使用天天基金/东方财富基金特色数据的当前年化跟踪误差口径。实际可申购额度及费率仍以下单渠道及基金管理人最新公告为准。<br>
   <strong>场内ETF：</strong>交易时段优先显示同一平台同一时点的场内价格与实时估值；非交易时间显示最近有效交易快照。
   东方财富 ETF 行情异常时，才整组回退到 Tinyright；仍不可用时，再对可覆盖产品整组回退到 HaoETF。绝不把不同平台的“价格”和“估值”拼接计算。交易状态同时依据东方财富 dataDate 与 snapshotTime 判断；Worker 对完整12只结果做约20秒共享缓存。
   历史溢价与历史场内行情共享同一日期窗口：任意一张图使用鼠标滚轮缩放或拖动进度条后，另一张图会同步到相同时间范围；默认显示最近约20个交易日；年度业绩仅保留柱状图，不显示下方年度数字表格；历史溢价以折线图展示，不显示逐日表格；鼠标悬停在图中节点可查看当天溢价率。历史数据优先直接采用 HaoETF 公布的 T-1日溢价率，不由本工具重新计算；近一周/近一月按最近5/20个可获取交易日统计，历史最高/最低指 HaoETF 当前可获取区间内的极值；HaoETF 未覆盖时使用 D1 备用记录。第三方实时估值不是交易所官方 IOPV。基金规模为最近一期披露净资产规模；“费率”为基金管理费率+托管费率的年化合计，不包含券商二级市场交易佣金；年度业绩按基金净值日收益复合计算。均仅供研究参考，不构成投资建议。<br><strong>QQQ：</strong>QQQ 行情与日线历史由 Yahoo Finance chart 接口分段读取，避免长周期请求自动降采样；年度业绩按上一年末复权价到本年末/最新复权价计算，并展示自1999年成立以来全部年度。ETF费率/净资产等补充字段会尝试从 Nasdaq ETF 摘要接口读取，若该字段当次不可用则显示“—”。
@@ -707,7 +722,6 @@ let otcRows=[];
 let otcCompanyQuotaMap=new Map();
 let otcLoaded=false;
 let otcLoading=false;
-let otcBackgroundRetryScheduled=false;
 let otcSortKey="companyQuota";
 let otcSortDir="desc";
 let selectedOtc=null;
@@ -739,7 +753,6 @@ let otcNewAnnouncementProducts=new Set();
 const OTC_SEEN_ANN_KEY="nasdaq100_otc_seen_ann_v1";
 
 const LOCAL_KEY="nasdaq100_etf_last_good_v1_1";
-const OTC_LOCAL_KEY="nasdaq100_otc_last_good_v3";
 const $=id=>document.getElementById(id);
 let rows=[],selected=null,refreshTimer=null,hist=[];
 let histAll=[];
@@ -1201,67 +1214,6 @@ function loadLocal(){
   try{return JSON.parse(localStorage.getItem(LOCAL_KEY)||"{}")}catch(_){return{}}
 }
 
-function otcPayloadMeta(payload){
-  if(!payload)return null;
-  const {
-    rows:ignoredRows,
-    announcementUpdates:ignoredUpdates,
-    ...meta
-  }=payload;
-  return meta;
-}
-
-function saveOtcLocalSnapshot(){
-  if(!otcRows.length)return;
-  try{
-    localStorage.setItem(
-      OTC_LOCAL_KEY,
-      JSON.stringify({
-        savedAt:new Date().toISOString(),
-        rows:otcRows,
-        cny:otcPayloadMeta(lastOtcPayload),
-        usd:otcPayloadMeta(lastOtcUsdPayload)
-      })
-    );
-  }catch(_){}
-}
-
-function restoreOtcLocalSnapshot(){
-  try{
-    const cached=JSON.parse(
-      localStorage.getItem(OTC_LOCAL_KEY)||"null"
-    );
-    if(
-      !cached||
-      !Array.isArray(cached.rows)||
-      !cached.rows.length
-    )return false;
-
-    otcRows=cached.rows.map(
-      r=>({
-        ...r,
-        dataStatus:r.dataStatus||"cached"
-      })
-    );
-    lastOtcPayload=cached.cny||null;
-    lastOtcUsdPayload=cached.usd||null;
-    renderOtc();
-    $("otcLastUpdate").textContent=
-      "浏览器最近有效数据 · "+
-      (
-        cached.savedAt
-          ?new Date(cached.savedAt).toLocaleString(
-              "zh-CN",
-              {hour12:false}
-            )
-          :"时间未知"
-      );
-    return true;
-  }catch(_){
-    return false;
-  }
-}
-
 function mergeLocal(apiRows){
   const local=loadLocal();
   return apiRows.map(r=>{
@@ -1603,26 +1555,10 @@ function compareOtcRows(a,b){
 
 function updateOtcSortHeaders(){
   document.querySelectorAll("th.otcSortable").forEach(th=>{
-    const isCompanyQuotaProxy=
-      otcSortKey==="companyQuota"&&
-      th.dataset.otcSort==="agencyLimit";
-    const active=
-      th.dataset.otcSort===otcSortKey||
-      isCompanyQuotaProxy;
+    const active=th.dataset.otcSort===otcSortKey;
     th.classList.toggle("active",active);
     const mark=th.querySelector(".sortMark");
     if(mark)mark.textContent=active?(otcSortDir==="asc"?"↑":"↓"):"↕";
-    th.setAttribute(
-      "aria-sort",
-      active
-        ?(otcSortDir==="asc"?"ascending":"descending")
-        :"none"
-    );
-    if(isCompanyQuotaProxy){
-      th.title="当前按公司最高可用额度降序并保持同公司相邻；点击后改为按单个份额代销额度排序";
-    }else{
-      th.removeAttribute("title");
-    }
   });
 }
 
@@ -1939,7 +1875,6 @@ async function loadOtcNavSummary(force=false){
 
     otcNavSummaryLoaded=true;
     renderOtc();
-    saveOtcLocalSnapshot();
   }catch(e){
     console.error(
       "OTC nav summary",
@@ -2003,7 +1938,6 @@ async function loadOtcTrackingSummary(
 
     otcTrackingLoaded=true;
     renderOtc();
-    saveOtcLocalSnapshot();
   }catch(e){
     console.error(
       "OTC tracking summary",
@@ -2127,25 +2061,6 @@ function renderOtc(){
     r=>r.currentVerificationStatus==="mismatch"
   ).length;
 
-  const otcSortNames={
-    companyQuota:"公司最高可用额度",
-    code:"代码",
-    name:"基金名称",
-    trackingError:"跟踪误差",
-    dailyReturn:"前一日涨跌幅",
-    share:"份额",
-    status:"状态",
-    agencyLimit:"代销额度",
-    directLimit:"直销额度",
-    annualFee:"年运作费",
-    annualReturn:"历史年度业绩",
-    quotaDate:"额度日期",
-    verification:"公告验证"
-  };
-  const otcSortText=
-    `${otcSortNames[otcSortKey]||otcSortKey}${otcSortDir==="asc"?"↑":"↓"}`+
-    (otcSortKey==="companyQuota"?" / 同公司聚合":"");
-
   // OTC数据后台加载完成后，刷新已打开详情页的跨市场同公司比较候选。
   if(
     selected &&
@@ -2175,7 +2090,7 @@ function renderOtc(){
     `合计限额 ${limited} · 暂停 ${suspended} · 开放 ${open} · `+
     `人民币公告一致 ${cnyMatched} · 不一致 ${cnyMismatch} · `+
     `本次新公告产品 ${otcNewAnnouncementProducts.size} · `+
-    `当前排序：${otcSortText}`;
+    `默认排序：公司人民币最高额度↓ / 同公司聚合`;
 
   renderAnnouncementUpdates();
 }
@@ -3862,16 +3777,12 @@ function updateStatusForView(){
     const usdInfo=lastOtcUsdPayload
       ?` · 美元份额 ${lastOtcUsdPayload.matched??"—"}/${lastOtcUsdPayload.total??2}`
       :"";
-    const refreshInfo=j.refreshingInBackground===true
-      ?" · Worker正在后台检查最新额度/公告"
-      :"";
 
     $("statusSub").textContent=
       `人民币额度日 ${j.quotaDate||"未知"} · 匹配 ${j.matched??"—"}/${j.total??41} · `+
       `公告列表检查 ${j.announcementListChecks??25} 个代码（17主代码+8特殊份额） · `+
       `本次重新读取公告正文 ${j.announcementContentFetches??0} 篇`+
-      usdInfo+
-      refreshInfo;
+      usdInfo;
     return;
   }
 
@@ -3916,7 +3827,6 @@ async function loadOtcUsdFunds(
     ];
 
     renderOtc();
-    saveOtcLocalSnapshot();
     return j;
   }catch(e){
     console.error(
@@ -3929,20 +3839,6 @@ async function loadOtcUsdFunds(
   }
 }
 
-
-// v3.28 backend compatibility:
-// Worker returns D1 cache metadata and may add new tracking fields.
-function otcCacheStatusText(payload){
-  if(!payload)return "";
-  if(payload.cacheInfo){
-    return `${payload.cacheInfo.source||"D1"} ${payload.cacheInfo.refreshMode||"daily"}`;
-  }
-  if(payload.servedFromDailyCache===true){
-    return "D1今日缓存";
-  }
-  return "";
-}
-
 async function loadOtcFunds(force=false){
   if(otcLoading)return;
   if(otcLoaded&&!force){
@@ -3951,11 +3847,10 @@ async function loadOtcFunds(force=false){
   }
 
   otcLoading=true;
-  $("otcRefresh").disabled=true;
   if(currentView==="otc"){
     $("dot").className="dot";
     $("statusTitle").textContent="正在读取场外额度";
-    $("statusSub").textContent="读取D1每日缓存；手动刷新时才重新获取额度和公告…";
+    $("statusSub").textContent="正在刷新场外额度，并检查基金产品是否出现新的额度公告…";
   }
 
   try{
@@ -3965,74 +3860,36 @@ async function loadOtcFunds(force=false){
         :"/api/otc-funds",
       35000
     );
-    const retainedUsdRows=otcRows.filter(
-      r=>r.currency==="USD"
-    );
     lastOtcPayload=j;
-    otcRows=[
-      ...(j.rows||[]),
-      ...retainedUsdRows
-    ];
+    otcRows=j.rows||[];
     otcLoaded=true;
     updateNewAnnouncementState(j);
     renderOtc();
-    saveOtcLocalSnapshot();
-    if(currentView==="otc")updateStatusForView();
 
     // 美元份额不套用人民币额度日报，单独读取当前美元份额状态。
     await loadOtcUsdFunds(force);
 
-    // 手动按钮只强刷“额度与公告”。
-    // 净值缓存2小时、跟踪误差缓存24小时，不随每次打开或手动刷新重复强刷43个份额。
+    // 净值/年度业绩、当前年化跟踪误差按 CNY / USD 两批独立请求。
     await Promise.all([
-      loadOtcNavSummary(false),
-      loadOtcTrackingSummary(false)
+      loadOtcNavSummary(force),
+      loadOtcTrackingSummary(force)
     ]);
 
     $("otcLastUpdate").textContent=
       `额度 ${j.quotaDate||"—"} · 公告检查 ${j.checkDate||"—"} · `+
-      `${new Date(j.generatedAt).toLocaleString("zh-CN",{hour12:false})}`+
-      (j.cacheInfo
-        ? ` · ${otcCacheStatusText(j)}`
-        : "");
+      `${new Date(j.generatedAt).toLocaleString("zh-CN",{hour12:false})}`;
     if(currentView==="otc")updateStatusForView();
-
-    // Worker返回最近有效缓存并在后台刷新时，本页只安排一次静默复查。
-    if(
-      j.refreshingInBackground===true&&
-      !otcBackgroundRetryScheduled
-    ){
-      otcBackgroundRetryScheduled=true;
-      setTimeout(()=>{
-        if(!document.hidden&&!otcLoading){
-          otcLoaded=false;
-          loadOtcFunds(false);
-        }
-      },20000);
-    }
   }catch(e){
     console.error(e);
-    if(otcRows.length){
-      renderOtc();
-      $("otcSummary").textContent+=
-        " · 本次刷新失败，继续显示最近有效数据";
-      if(currentView==="otc"){
-        $("dot").className="dot warn";
-        $("statusTitle").textContent="场外刷新失败 · 已保留原数据";
-        $("statusSub").textContent=e.message||"Worker暂不可用";
-      }
-    }else{
-      $("otcBody").innerHTML='<tr><td colspan="14" class="empty">场外额度/公告读取失败，请确认 Worker 已部署 v3.26。</td></tr>';
-      $("otcSummary").textContent="场外额度读取失败";
-      if(currentView==="otc"){
-        $("dot").className="dot warn";
-        $("statusTitle").textContent="场外额度读取失败";
-        $("statusSub").textContent=e.message||"Worker不可用";
-      }
+    $("otcBody").innerHTML='<tr><td colspan="14" class="empty">场外额度/公告读取失败，请确认 Worker 已部署 v3.23。</td></tr>';
+    $("otcSummary").textContent="场外额度读取失败";
+    if(currentView==="otc"){
+      $("dot").className="dot warn";
+      $("statusTitle").textContent="场外额度读取失败";
+      $("statusSub").textContent=e.message||"Worker不可用";
     }
   }finally{
     otcLoading=false;
-    $("otcRefresh").disabled=false;
   }
 }
 
@@ -6980,12 +6837,11 @@ document.addEventListener("visibilitychange",()=>{
 bindSortHeaders();
 bindOtcSortHeaders();
 switchView("etf");
-restoreOtcLocalSnapshot();
 loadPremiums();
 
-// 每次打开网页在后台预读场外数据，但优先使用 Worker 缓存。
-// 只有用户点击“刷新额度与公告”时才强制访问全部额度/公告上游。
-loadOtcFunds(false);
+// 每次打开网页只主动执行一次场外额度 + 公告检查。
+// 即使用户暂时停留在“场内ETF”页签，也会在后台完成。
+loadOtcFunds(true);
 })();
 </script>
 </body>

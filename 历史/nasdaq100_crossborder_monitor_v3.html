@@ -335,7 +335,7 @@ canvas{width:100%;height:100%;display:block}
 
 <section id="etfCard" class="card">
   <div class="head">
-    <div><h2>12只纳指100 ETF</h2><div class="tag">V3.28 · OTC D1 DAILY CACHE · RESPONSIVE TABLE</div></div>
+    <div><h2>12只纳指100 ETF</h2><div class="tag">V3 · OTC FAST LOAD · RESPONSIVE TABLE</div></div>
     <button id="refresh" class="refresh">立即刷新</button>
   </div>
   <div class="body">
@@ -3929,20 +3929,6 @@ async function loadOtcUsdFunds(
   }
 }
 
-
-// v3.28 backend compatibility:
-// Worker returns D1 cache metadata and may add new tracking fields.
-function otcCacheStatusText(payload){
-  if(!payload)return "";
-  if(payload.cacheInfo){
-    return `${payload.cacheInfo.source||"D1"} ${payload.cacheInfo.refreshMode||"daily"}`;
-  }
-  if(payload.servedFromDailyCache===true){
-    return "D1今日缓存";
-  }
-  return "";
-}
-
 async function loadOtcFunds(force=false){
   if(otcLoading)return;
   if(otcLoaded&&!force){
@@ -3955,7 +3941,7 @@ async function loadOtcFunds(force=false){
   if(currentView==="otc"){
     $("dot").className="dot";
     $("statusTitle").textContent="正在读取场外额度";
-    $("statusSub").textContent="读取D1每日缓存；手动刷新时才重新获取额度和公告…";
+    $("statusSub").textContent="正在刷新场外额度，并检查基金产品是否出现新的额度公告…";
   }
 
   try{
@@ -3991,10 +3977,7 @@ async function loadOtcFunds(force=false){
 
     $("otcLastUpdate").textContent=
       `额度 ${j.quotaDate||"—"} · 公告检查 ${j.checkDate||"—"} · `+
-      `${new Date(j.generatedAt).toLocaleString("zh-CN",{hour12:false})}`+
-      (j.cacheInfo
-        ? ` · ${otcCacheStatusText(j)}`
-        : "");
+      `${new Date(j.generatedAt).toLocaleString("zh-CN",{hour12:false})}`;
     if(currentView==="otc")updateStatusForView();
 
     // Worker返回最近有效缓存并在后台刷新时，本页只安排一次静默复查。
