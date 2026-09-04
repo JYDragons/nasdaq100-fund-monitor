@@ -1,18 +1,18 @@
 // v3.28 complete build
 /**
- * ÄÉÖ¸100 ETF ³¡ÄÚÒç¼Û¼à¿Ø Worker v2
+ * çº³æŒ‡100 ETF åœºå†…æº¢ä»·ç›‘æ§ Worker v2
  *
- * ÊµÊ±Êı¾İÓÅÏÈ¼¶£º
- * 1. ¶«·½²Æ¸» ETF ĞĞÇé£¨×îĞÂ¼Û f2 + IOPV f441£¬Í¬Ò»Ìõ ETF ¿ìÕÕ£©
- * 2. naKanban / Tinyright£¨Í¬Ô´¼Û¸ñ + ÊµÊ±¹ÀÖµ£©
- * 3. HaoETF£¨Í¬Ô´¼Û¸ñ + ÊµÊ±¹ÀÖµ£¬½öÒÑÈ·ÈÏ¸²¸Ç²úÆ·£©
- * 4. Cloudflare ×î½üÓĞĞ§»º´æ
+ * å®æ—¶æ•°æ®ä¼˜å…ˆçº§ï¼š
+ * 1. ä¸œæ–¹è´¢å¯Œ ETF è¡Œæƒ…ï¼ˆæœ€æ–°ä»· f2 + IOPV f441ï¼ŒåŒä¸€æ¡ ETF å¿«ç…§ï¼‰
+ * 2. naKanban / Tinyrightï¼ˆåŒæºä»·æ ¼ + å®æ—¶ä¼°å€¼ï¼‰
+ * 3. HaoETFï¼ˆåŒæºä»·æ ¼ + å®æ—¶ä¼°å€¼ï¼Œä»…å·²ç¡®è®¤è¦†ç›–äº§å“ï¼‰
+ * 4. Cloudflare æœ€è¿‘æœ‰æ•ˆç¼“å­˜
  *
- * ¹Ø¼üÔ­Ôò£º
- * - ¾ø²»¿çÆ½Ì¨Æ´½Ó¡°¼Û¸ñ¡±ºÍ¡°¹ÀÖµ¡±¡£
- * - Òç¼ÛÂÊÊ¼ÖÕÓÉ±¾ Worker ×ÔËã£ºprice / estimate - 1¡£
- * - ¶«·½²Æ¸» f402 ÊÇ¡°»ù½ğÕÛ¼ÛÂÊ¡±£¬ËùÒÔÆ½Ì¨Òç¼ÛĞ£ÑéÖµ = -f402¡£
- * - ¶«·½²Æ¸» ETF ÁĞ±í°´ 100 Ìõ/Ò³·ÖÒ³À­È¡£¬±ÜÃâ pz ³¬´óµ¼ÖÂÈ±Ò³/½Ø¶Ï¡£
+ * å…³é”®åŸåˆ™ï¼š
+ * - ç»ä¸è·¨å¹³å°æ‹¼æ¥â€œä»·æ ¼â€å’Œâ€œä¼°å€¼â€ã€‚
+ * - æº¢ä»·ç‡å§‹ç»ˆç”±æœ¬ Worker è‡ªç®—ï¼šprice / estimate - 1ã€‚
+ * - ä¸œæ–¹è´¢å¯Œ f402 æ˜¯â€œåŸºé‡‘æŠ˜ä»·ç‡â€ï¼Œæ‰€ä»¥å¹³å°æº¢ä»·æ ¡éªŒå€¼ = -f402ã€‚
+ * - ä¸œæ–¹è´¢å¯Œ ETF åˆ—è¡¨æŒ‰ 100 æ¡/é¡µåˆ†é¡µæ‹‰å–ï¼Œé¿å… pz è¶…å¤§å¯¼è‡´ç¼ºé¡µ/æˆªæ–­ã€‚
  *
  * API:
  * GET /health
@@ -27,79 +27,79 @@
  */
 
 const ETF_META = [
-  { code:"513100", company:"¹úÌ©»ù½ğ",     size:194.68, sizeDate:"2026-06-30", inception:"2013-04-25", managementFee:0.60, custodyFee:0.20 },
-  { code:"159941", company:"¹ã·¢»ù½ğ",     size:346.82, sizeDate:"2026-06-30", inception:"2015-06-10", managementFee:0.80, custodyFee:0.20 },
-  { code:"513300", company:"»ªÏÄ»ù½ğ",     size:128.77, sizeDate:"2026-06-30", inception:"2020-10-22", managementFee:0.60, custodyFee:0.20 },
-  { code:"159632", company:"»ª°²»ù½ğ",     size:113.00, sizeDate:"2026-06-30", inception:"2022-07-21", managementFee:0.60, custodyFee:0.20 },
-  { code:"513110", company:"»ªÌ©°ØÈğ",     size:49.33,  sizeDate:"2026-06-30", inception:"2023-03-01", managementFee:0.80, custodyFee:0.20 },
-  { code:"159660", company:"»ãÌí¸»",       size:49.10,  sizeDate:"2026-06-30", inception:"2023-03-30", managementFee:0.50, custodyFee:0.15 },
-  { code:"159659", company:"ÕĞÉÌ»ù½ğ",     size:99.36,  sizeDate:"2026-06-30", inception:"2023-04-12", managementFee:0.50, custodyFee:0.15 },
-  { code:"513390", company:"²©Ê±»ù½ğ",     size:42.50,  sizeDate:"2026-06-30", inception:"2023-04-19", managementFee:0.50, custodyFee:0.15 },
-  { code:"159501", company:"¼ÎÊµ»ù½ğ",     size:118.44, sizeDate:"2026-06-30", inception:"2023-05-31", managementFee:0.50, custodyFee:0.10 },
-  { code:"159513", company:"´ó³É»ù½ğ",     size:73.84,  sizeDate:"2026-06-30", inception:"2023-07-12", managementFee:0.80, custodyFee:0.20 },
-  { code:"159696", company:"Ò×·½´ï",       size:50.11,  sizeDate:"2026-06-30", inception:"2023-08-17", managementFee:0.50, custodyFee:0.10 },
-  { code:"513870", company:"¸»¹ú»ù½ğ",     size:24.71,  sizeDate:"2026-06-30", inception:"2023-10-25", managementFee:0.50, custodyFee:0.10 },
+  { code:"513100", company:"å›½æ³°åŸºé‡‘",     size:194.68, sizeDate:"2026-06-30", inception:"2013-04-25", managementFee:0.60, custodyFee:0.20 },
+  { code:"159941", company:"å¹¿å‘åŸºé‡‘",     size:346.82, sizeDate:"2026-06-30", inception:"2015-06-10", managementFee:0.80, custodyFee:0.20 },
+  { code:"513300", company:"åå¤åŸºé‡‘",     size:128.77, sizeDate:"2026-06-30", inception:"2020-10-22", managementFee:0.60, custodyFee:0.20 },
+  { code:"159632", company:"åå®‰åŸºé‡‘",     size:113.00, sizeDate:"2026-06-30", inception:"2022-07-21", managementFee:0.60, custodyFee:0.20 },
+  { code:"513110", company:"åæ³°æŸç‘",     size:49.33,  sizeDate:"2026-06-30", inception:"2023-03-01", managementFee:0.80, custodyFee:0.20 },
+  { code:"159660", company:"æ±‡æ·»å¯Œ",       size:49.10,  sizeDate:"2026-06-30", inception:"2023-03-30", managementFee:0.50, custodyFee:0.15 },
+  { code:"159659", company:"æ‹›å•†åŸºé‡‘",     size:99.36,  sizeDate:"2026-06-30", inception:"2023-04-12", managementFee:0.50, custodyFee:0.15 },
+  { code:"513390", company:"åšæ—¶åŸºé‡‘",     size:42.50,  sizeDate:"2026-06-30", inception:"2023-04-19", managementFee:0.50, custodyFee:0.15 },
+  { code:"159501", company:"å˜‰å®åŸºé‡‘",     size:118.44, sizeDate:"2026-06-30", inception:"2023-05-31", managementFee:0.50, custodyFee:0.10 },
+  { code:"159513", company:"å¤§æˆåŸºé‡‘",     size:73.84,  sizeDate:"2026-06-30", inception:"2023-07-12", managementFee:0.80, custodyFee:0.20 },
+  { code:"159696", company:"æ˜“æ–¹è¾¾",       size:50.11,  sizeDate:"2026-06-30", inception:"2023-08-17", managementFee:0.50, custodyFee:0.10 },
+  { code:"513870", company:"å¯Œå›½åŸºé‡‘",     size:24.71,  sizeDate:"2026-06-30", inception:"2023-10-25", managementFee:0.50, custodyFee:0.10 },
 ];
 
 
 const OTC_CNY_META = [
-  {code:"000834", name:"´ó³ÉÄÉË¹´ï¿Ë100ETFÁª½Ó(QDII)A", company:"´ó³É»ù½ğ", share:"A", managementFee:0.80, custodyFee:0.20, serviceFee:0.00},
-  {code:"006479", name:"¹ã·¢ÄÉË¹´ï¿Ë100ETFÁª½ÓÈËÃñ±Ò(QDII)C", company:"¹ã·¢»ù½ğ", share:"C", managementFee:0.80, custodyFee:0.20, serviceFee:0.20},
-  {code:"008971", name:"´ó³ÉÄÉË¹´ï¿Ë100ETFÁª½Ó(QDII)C", company:"´ó³É»ù½ğ", share:"C", managementFee:0.80, custodyFee:0.20, serviceFee:0.30},
-  {code:"012752", name:"½¨ĞÅÄÉË¹´ï¿Ë100Ö¸Êı(QDII)CÈËÃñ±Ò", company:"½¨ĞÅ»ù½ğ", share:"C", managementFee:0.80, custodyFee:0.20, serviceFee:0.30},
-  {code:"014978", name:"»ª°²ÄÉË¹´ï¿Ë100ETFÁª½Ó(QDII)C", company:"»ª°²»ù½ğ", share:"C", managementFee:0.60, custodyFee:0.20, serviceFee:0.20},
-  {code:"016452", name:"ÄÏ·½ÄÉË¹´ï¿Ë100Ö¸Êı·¢Æğ(QDII)A", company:"ÄÏ·½»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
-  {code:"016453", name:"ÄÏ·½ÄÉË¹´ï¿Ë100Ö¸Êı·¢Æğ(QDII)C", company:"ÄÏ·½»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.10},
-  {code:"018966", name:"»ãÌí¸»ÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)ÈËÃñ±ÒA", company:"»ãÌí¸»»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
-  {code:"018967", name:"»ãÌí¸»ÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)ÈËÃñ±ÒC", company:"»ãÌí¸»»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.40},
-  {code:"019172", name:"Ä¦¸ùÄÉË¹´ï¿Ë100Ö¸Êı(QDII)ÈËÃñ±ÒA", company:"Ä¦¸ù»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.10, serviceFee:0.00},
-  {code:"019173", name:"Ä¦¸ùÄÉË¹´ï¿Ë100Ö¸Êı(QDII)ÈËÃñ±ÒC", company:"Ä¦¸ù»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.10, serviceFee:0.30},
-  {code:"019441", name:"Íò¼ÒÄÉË¹´ï¿Ë100Ö¸Êı·¢ÆğÊ½(QDII)A", company:"Íò¼Ò»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
-  {code:"019442", name:"Íò¼ÒÄÉË¹´ï¿Ë100Ö¸Êı·¢ÆğÊ½(QDII)C", company:"Íò¼Ò»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.20},
-  {code:"019524", name:"»ªÌ©°ØÈğÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)A", company:"»ªÌ©°ØÈğ»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
-  {code:"019525", name:"»ªÌ©°ØÈğÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)C", company:"»ªÌ©°ØÈğ»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.25},
-  {code:"019547", name:"ÕĞÉÌÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)A", company:"ÕĞÉÌ»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
-  {code:"019548", name:"ÕĞÉÌÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)C", company:"ÕĞÉÌ»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.40},
-  {code:"019736", name:"±¦Ó¯ÄÉË¹´ï¿Ë100Ö¸Êı·¢Æğ(QDII)AÈËÃñ±Ò", company:"±¦Ó¯»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
-  {code:"019737", name:"±¦Ó¯ÄÉË¹´ï¿Ë100Ö¸Êı·¢Æğ(QDII)CÈËÃñ±Ò", company:"±¦Ó¯»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.25},
-  {code:"021000", name:"ÄÏ·½ÄÉË¹´ï¿Ë100Ö¸Êı·¢Æğ(QDII)I", company:"ÄÏ·½»ù½ğ", share:"I", managementFee:0.50, custodyFee:0.15, serviceFee:0.01},
-  {code:"021773", name:"»ãÌí¸»ÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)ÈËÃñ±ÒE", company:"»ãÌí¸»»ù½ğ", share:"E", managementFee:0.50, custodyFee:0.15, serviceFee:0.10},
-  {code:"021778", name:"¹ã·¢ÄÉÖ¸100ETFÁª½Ó(QDII)ÈËÃñ±ÒF", company:"¹ã·¢»ù½ğ", share:"F", managementFee:0.80, custodyFee:0.20, serviceFee:0.18},
-  {code:"022664", name:"»ªÌ©°ØÈğÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)I", company:"»ªÌ©°ØÈğ»ù½ğ", share:"I", managementFee:0.50, custodyFee:0.15, serviceFee:0.10},
-  {code:"023422", name:"½¨ĞÅÄÉË¹´ï¿Ë100Ö¸Êı(QDII)DÈËÃñ±Ò", company:"½¨ĞÅ»ù½ğ", share:"D", managementFee:0.80, custodyFee:0.20, serviceFee:0.30},
-  {code:"040046", name:"»ª°²ÄÉË¹´ï¿Ë100ETFÁª½Ó(QDII)A", company:"»ª°²»ù½ğ", share:"A", managementFee:0.60, custodyFee:0.20, serviceFee:0.00},
-  {code:"160213", name:"¹úÌ©ÄÉË¹´ï¿Ë100Ö¸Êı", company:"¹úÌ©»ù½ğ", share:"µ¥Ò»", managementFee:0.80, custodyFee:0.20, serviceFee:0.00},
-  {code:"270042", name:"¹ã·¢ÄÉË¹´ï¿Ë100ETFÁª½ÓÈËÃñ±Ò(QDII)A", company:"¹ã·¢»ù½ğ", share:"A", managementFee:0.80, custodyFee:0.20, serviceFee:0.00},
-  {code:"539001", name:"½¨ĞÅÄÉË¹´ï¿Ë100Ö¸Êı(QDII)AÈËÃñ±Ò", company:"½¨ĞÅ»ù½ğ", share:"A", managementFee:0.80, custodyFee:0.20, serviceFee:0.00},
-  {code:"012870", name:"Ò×·½´ïÄÉË¹´ï¿Ë100ETFÁª½Ó(QDII-LOF)C(ÈËÃñ±Ò)", company:"Ò×·½´ï»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.10, serviceFee:0.30},
-  {code:"015299", name:"»ªÏÄÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)A", company:"»ªÏÄ»ù½ğ", share:"A", managementFee:0.60, custodyFee:0.20, serviceFee:0.00},
-  {code:"015300", name:"»ªÏÄÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)C", company:"»ªÏÄ»ù½ğ", share:"C", managementFee:0.60, custodyFee:0.20, serviceFee:0.30},
-  {code:"016055", name:"²©Ê±ÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)AÈËÃñ±Ò", company:"²©Ê±»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
-  {code:"016057", name:"²©Ê±ÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)CÈËÃñ±Ò", company:"²©Ê±»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.30},
-  {code:"016532", name:"¼ÎÊµÄÉË¹´ï¿Ë100ETF·¢ÆğÁª½Ó(QDII)AÈËÃñ±Ò", company:"¼ÎÊµ»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.10, serviceFee:0.00},
-  {code:"016533", name:"¼ÎÊµÄÉË¹´ï¿Ë100ETF·¢ÆğÁª½Ó(QDII)CÈËÃñ±Ò", company:"¼ÎÊµ»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.10, serviceFee:0.25},
-  {code:"018043", name:"ÌìºëÄÉË¹´ï¿Ë100Ö¸Êı·¢Æğ(QDII)A", company:"Ììºë»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.10, serviceFee:0.00},
-  {code:"018044", name:"ÌìºëÄÉË¹´ï¿Ë100Ö¸Êı·¢Æğ(QDII)C", company:"Ììºë»ù½ğ", share:"C", managementFee:0.50, custodyFee:0.10, serviceFee:0.20},
-  {code:"021838", name:"¼ÎÊµÄÉË¹´ï¿Ë100ETF·¢ÆğÁª½Ó(QDII)IÈËÃñ±Ò", company:"¼ÎÊµ»ù½ğ", share:"I", managementFee:0.50, custodyFee:0.10, serviceFee:0.10},
-  {code:"022525", name:"ÌìºëÄÉË¹´ï¿Ë100Ö¸Êı·¢Æğ(QDII)D", company:"Ììºë»ù½ğ", share:"D", managementFee:0.50, custodyFee:0.10, serviceFee:0.20},
-  {code:"024237", name:"²©Ê±ÄÉË¹´ï¿Ë100ETF·¢ÆğÊ½Áª½Ó(QDII)IÈËÃñ±Ò", company:"²©Ê±»ù½ğ", share:"I", managementFee:0.50, custodyFee:0.15, serviceFee:0.15},
-  {code:"161130", name:"Ò×·½´ïÄÉË¹´ï¿Ë100ETFÁª½Ó(QDII-LOF)A(ÈËÃñ±Ò)", company:"Ò×·½´ï»ù½ğ", share:"A", managementFee:0.50, custodyFee:0.10, serviceFee:0.00},
+  {code:"000834", name:"å¤§æˆçº³æ–¯è¾¾å…‹100ETFè”æ¥(QDII)A", company:"å¤§æˆåŸºé‡‘", share:"A", managementFee:0.80, custodyFee:0.20, serviceFee:0.00},
+  {code:"006479", name:"å¹¿å‘çº³æ–¯è¾¾å…‹100ETFè”æ¥äººæ°‘å¸(QDII)C", company:"å¹¿å‘åŸºé‡‘", share:"C", managementFee:0.80, custodyFee:0.20, serviceFee:0.20},
+  {code:"008971", name:"å¤§æˆçº³æ–¯è¾¾å…‹100ETFè”æ¥(QDII)C", company:"å¤§æˆåŸºé‡‘", share:"C", managementFee:0.80, custodyFee:0.20, serviceFee:0.30},
+  {code:"012752", name:"å»ºä¿¡çº³æ–¯è¾¾å…‹100æŒ‡æ•°(QDII)Cäººæ°‘å¸", company:"å»ºä¿¡åŸºé‡‘", share:"C", managementFee:0.80, custodyFee:0.20, serviceFee:0.30},
+  {code:"014978", name:"åå®‰çº³æ–¯è¾¾å…‹100ETFè”æ¥(QDII)C", company:"åå®‰åŸºé‡‘", share:"C", managementFee:0.60, custodyFee:0.20, serviceFee:0.20},
+  {code:"016452", name:"å—æ–¹çº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·(QDII)A", company:"å—æ–¹åŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
+  {code:"016453", name:"å—æ–¹çº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·(QDII)C", company:"å—æ–¹åŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.10},
+  {code:"018966", name:"æ±‡æ·»å¯Œçº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)äººæ°‘å¸A", company:"æ±‡æ·»å¯ŒåŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
+  {code:"018967", name:"æ±‡æ·»å¯Œçº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)äººæ°‘å¸C", company:"æ±‡æ·»å¯ŒåŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.40},
+  {code:"019172", name:"æ‘©æ ¹çº³æ–¯è¾¾å…‹100æŒ‡æ•°(QDII)äººæ°‘å¸A", company:"æ‘©æ ¹åŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.10, serviceFee:0.00},
+  {code:"019173", name:"æ‘©æ ¹çº³æ–¯è¾¾å…‹100æŒ‡æ•°(QDII)äººæ°‘å¸C", company:"æ‘©æ ¹åŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.10, serviceFee:0.30},
+  {code:"019441", name:"ä¸‡å®¶çº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·å¼(QDII)A", company:"ä¸‡å®¶åŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
+  {code:"019442", name:"ä¸‡å®¶çº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·å¼(QDII)C", company:"ä¸‡å®¶åŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.20},
+  {code:"019524", name:"åæ³°æŸç‘çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)A", company:"åæ³°æŸç‘åŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
+  {code:"019525", name:"åæ³°æŸç‘çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)C", company:"åæ³°æŸç‘åŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.25},
+  {code:"019547", name:"æ‹›å•†çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)A", company:"æ‹›å•†åŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
+  {code:"019548", name:"æ‹›å•†çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)C", company:"æ‹›å•†åŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.40},
+  {code:"019736", name:"å®ç›ˆçº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·(QDII)Aäººæ°‘å¸", company:"å®ç›ˆåŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
+  {code:"019737", name:"å®ç›ˆçº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·(QDII)Cäººæ°‘å¸", company:"å®ç›ˆåŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.25},
+  {code:"021000", name:"å—æ–¹çº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·(QDII)I", company:"å—æ–¹åŸºé‡‘", share:"I", managementFee:0.50, custodyFee:0.15, serviceFee:0.01},
+  {code:"021773", name:"æ±‡æ·»å¯Œçº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)äººæ°‘å¸E", company:"æ±‡æ·»å¯ŒåŸºé‡‘", share:"E", managementFee:0.50, custodyFee:0.15, serviceFee:0.10},
+  {code:"021778", name:"å¹¿å‘çº³æŒ‡100ETFè”æ¥(QDII)äººæ°‘å¸F", company:"å¹¿å‘åŸºé‡‘", share:"F", managementFee:0.80, custodyFee:0.20, serviceFee:0.18},
+  {code:"022664", name:"åæ³°æŸç‘çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)I", company:"åæ³°æŸç‘åŸºé‡‘", share:"I", managementFee:0.50, custodyFee:0.15, serviceFee:0.10},
+  {code:"023422", name:"å»ºä¿¡çº³æ–¯è¾¾å…‹100æŒ‡æ•°(QDII)Däººæ°‘å¸", company:"å»ºä¿¡åŸºé‡‘", share:"D", managementFee:0.80, custodyFee:0.20, serviceFee:0.30},
+  {code:"040046", name:"åå®‰çº³æ–¯è¾¾å…‹100ETFè”æ¥(QDII)A", company:"åå®‰åŸºé‡‘", share:"A", managementFee:0.60, custodyFee:0.20, serviceFee:0.00},
+  {code:"160213", name:"å›½æ³°çº³æ–¯è¾¾å…‹100æŒ‡æ•°", company:"å›½æ³°åŸºé‡‘", share:"å•ä¸€", managementFee:0.80, custodyFee:0.20, serviceFee:0.00},
+  {code:"270042", name:"å¹¿å‘çº³æ–¯è¾¾å…‹100ETFè”æ¥äººæ°‘å¸(QDII)A", company:"å¹¿å‘åŸºé‡‘", share:"A", managementFee:0.80, custodyFee:0.20, serviceFee:0.00},
+  {code:"539001", name:"å»ºä¿¡çº³æ–¯è¾¾å…‹100æŒ‡æ•°(QDII)Aäººæ°‘å¸", company:"å»ºä¿¡åŸºé‡‘", share:"A", managementFee:0.80, custodyFee:0.20, serviceFee:0.00},
+  {code:"012870", name:"æ˜“æ–¹è¾¾çº³æ–¯è¾¾å…‹100ETFè”æ¥(QDII-LOF)C(äººæ°‘å¸)", company:"æ˜“æ–¹è¾¾åŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.10, serviceFee:0.30},
+  {code:"015299", name:"åå¤çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)A", company:"åå¤åŸºé‡‘", share:"A", managementFee:0.60, custodyFee:0.20, serviceFee:0.00},
+  {code:"015300", name:"åå¤çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)C", company:"åå¤åŸºé‡‘", share:"C", managementFee:0.60, custodyFee:0.20, serviceFee:0.30},
+  {code:"016055", name:"åšæ—¶çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)Aäººæ°‘å¸", company:"åšæ—¶åŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.15, serviceFee:0.00},
+  {code:"016057", name:"åšæ—¶çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)Cäººæ°‘å¸", company:"åšæ—¶åŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.15, serviceFee:0.30},
+  {code:"016532", name:"å˜‰å®çº³æ–¯è¾¾å…‹100ETFå‘èµ·è”æ¥(QDII)Aäººæ°‘å¸", company:"å˜‰å®åŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.10, serviceFee:0.00},
+  {code:"016533", name:"å˜‰å®çº³æ–¯è¾¾å…‹100ETFå‘èµ·è”æ¥(QDII)Cäººæ°‘å¸", company:"å˜‰å®åŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.10, serviceFee:0.25},
+  {code:"018043", name:"å¤©å¼˜çº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·(QDII)A", company:"å¤©å¼˜åŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.10, serviceFee:0.00},
+  {code:"018044", name:"å¤©å¼˜çº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·(QDII)C", company:"å¤©å¼˜åŸºé‡‘", share:"C", managementFee:0.50, custodyFee:0.10, serviceFee:0.20},
+  {code:"021838", name:"å˜‰å®çº³æ–¯è¾¾å…‹100ETFå‘èµ·è”æ¥(QDII)Iäººæ°‘å¸", company:"å˜‰å®åŸºé‡‘", share:"I", managementFee:0.50, custodyFee:0.10, serviceFee:0.10},
+  {code:"022525", name:"å¤©å¼˜çº³æ–¯è¾¾å…‹100æŒ‡æ•°å‘èµ·(QDII)D", company:"å¤©å¼˜åŸºé‡‘", share:"D", managementFee:0.50, custodyFee:0.10, serviceFee:0.20},
+  {code:"024237", name:"åšæ—¶çº³æ–¯è¾¾å…‹100ETFå‘èµ·å¼è”æ¥(QDII)Iäººæ°‘å¸", company:"åšæ—¶åŸºé‡‘", share:"I", managementFee:0.50, custodyFee:0.15, serviceFee:0.15},
+  {code:"161130", name:"æ˜“æ–¹è¾¾çº³æ–¯è¾¾å…‹100ETFè”æ¥(QDII-LOF)A(äººæ°‘å¸)", company:"æ˜“æ–¹è¾¾åŸºé‡‘", share:"A", managementFee:0.50, custodyFee:0.10, serviceFee:0.00},
 ].map(x => ({
   ...x,
   currency:"CNY",
-  currencyLabel:"ÈËÃñ±Ò",
+  currencyLabel:"äººæ°‘å¸",
   annualFee:+(x.managementFee+x.custodyFee+x.serviceFee).toFixed(2)
 }));
 
-// µ±Ç°½ö±£Áô¹ã·¢ÄÉÖ¸100ÃÀÔª A/C Á½¸ö·İ¶î¡£
-// ÃÀÔª·İ¶î²»Ö±½ÓÌ×ÓÃÈËÃñ±Ò¶î¶ÈÈÕ±¨£»¶î¶È/×´Ì¬µ¥¶À¶ÁÈ¡¡£
+// å½“å‰ä»…ä¿ç•™å¹¿å‘çº³æŒ‡100ç¾å…ƒ A/C ä¸¤ä¸ªä»½é¢ã€‚
+// ç¾å…ƒä»½é¢ä¸ç›´æ¥å¥—ç”¨äººæ°‘å¸é¢åº¦æ—¥æŠ¥ï¼›é¢åº¦/çŠ¶æ€å•ç‹¬è¯»å–ã€‚
 const OTC_USD_META = [
   {
     code:"000055",
     mainCode:"270042",
-    name:"¹ã·¢ÄÉË¹´ï¿Ë100ETFÁª½Ó(QDII)ÃÀÔªA",
-    company:"¹ã·¢»ù½ğ",
-    share:"A¡¤ÃÀÔªÏÖ»ã",
+    name:"å¹¿å‘çº³æ–¯è¾¾å…‹100ETFè”æ¥(QDII)ç¾å…ƒA",
+    company:"å¹¿å‘åŸºé‡‘",
+    share:"AÂ·ç¾å…ƒç°æ±‡",
     managementFee:0.80,
     custodyFee:0.20,
     serviceFee:0.00
@@ -107,9 +107,9 @@ const OTC_USD_META = [
   {
     code:"006480",
     mainCode:"270042",
-    name:"¹ã·¢ÄÉË¹´ï¿Ë100ETFÁª½Ó(QDII)ÃÀÔªC",
-    company:"¹ã·¢»ù½ğ",
-    share:"C¡¤ÃÀÔªÏÖ»ã",
+    name:"å¹¿å‘çº³æ–¯è¾¾å…‹100ETFè”æ¥(QDII)ç¾å…ƒC",
+    company:"å¹¿å‘åŸºé‡‘",
+    share:"CÂ·ç¾å…ƒç°æ±‡",
     managementFee:0.80,
     custodyFee:0.20,
     serviceFee:0.20
@@ -117,7 +117,7 @@ const OTC_USD_META = [
 ].map(x => ({
   ...x,
   currency:"USD",
-  currencyLabel:"ÃÀÔª",
+  currencyLabel:"ç¾å…ƒ",
   annualFee:+(
     x.managementFee+
     x.custodyFee+
@@ -137,8 +137,8 @@ const OTC_CODES = new Set(OTC_META.map(x => x.code));
 const OTC_CNY_META_MAP = new Map(OTC_CNY_META.map(x => [x.code,x]));
 const OTC_META_MAP = new Map(OTC_META.map(x => [x.code,x]));
 
-// 17 ¸ö¡°»ù½ğ²úÆ·¡±£¬41 ¸öÈËÃñ±Ò·İ¶î¡£
-// Ã¿ÈÕÖ»°´Ö÷´úÂë¶ÁÈ¡²úÆ·¹«¸æ£¬ÔÙ°Ñ¹«¸æ×´Ì¬Ó³Éä»Ø¸÷·İ¶î¡£
+// 17 ä¸ªâ€œåŸºé‡‘äº§å“â€ï¼Œ41 ä¸ªäººæ°‘å¸ä»½é¢ã€‚
+// æ¯æ—¥åªæŒ‰ä¸»ä»£ç è¯»å–äº§å“å…¬å‘Šï¼Œå†æŠŠå…¬å‘ŠçŠ¶æ€æ˜ å°„å›å„ä»½é¢ã€‚
 const OTC_PRODUCTS = [
   {mainCode:"539001", shares:["539001","012752","023422"]},
   {mainCode:"160213", shares:["160213"]},
@@ -179,7 +179,6 @@ const OTC_RESULT_CACHE_URL =
 const OTC_LAST_GOOD_CACHE_URL =
   "https://nasdaq100-etf-monitor.internal/otc-hybrid-last-good-v4";
 const OTC_ENGINE_VERSION = "v3.26";
-const OTC_RESULT_FRESH_MS = 5*60*1000;
 const OTC_PRODUCT_CACHE_PREFIX =
   "https://nasdaq100-etf-monitor.internal/otc-product-ann-state-v3/";
 const OTC_FEE_CACHE_PREFIX =
@@ -211,8 +210,8 @@ const OTC_ANN_BUNDLE_CACHE_URL =
 const OTC_ANN_BUNDLE_FALLBACK_CACHE_URL =
   "https://nasdaq100-etf-monitor.internal/otc-ann-bundle-v6";
 
-// A/C Í¨³£¸úËæÖ÷´úÂë¹«¸æ£»D/E/F/I ĞÂÔö·İ¶î¸üÈİÒ×´æÔÚ¶ÀÁ¢¹«¸æ¡£
-// Òò´ËÃ¿ÈÕ¼ì²é 17 ¸öÖ÷´úÂë + ÕâĞ©ÌØÊâ·İ¶î´úÂë¡£
+// A/C é€šå¸¸è·Ÿéšä¸»ä»£ç å…¬å‘Šï¼›D/E/F/I æ–°å¢ä»½é¢æ›´å®¹æ˜“å­˜åœ¨ç‹¬ç«‹å…¬å‘Šã€‚
+// å› æ­¤æ¯æ—¥æ£€æŸ¥ 17 ä¸ªä¸»ä»£ç  + è¿™äº›ç‰¹æ®Šä»½é¢ä»£ç ã€‚
 const OTC_SPECIAL_ANN_CODES = OTC_CNY_META
   .filter(x => ["D","E","F","I"].includes(x.share))
   .map(x => x.code);
@@ -291,7 +290,7 @@ function numberOf(v) {
   if (v === null || v === undefined) return null;
   if (typeof v === "number") return Number.isFinite(v) ? v : null;
   const t = stripHtml(v).replace(/,/g,"").replace(/%/g,"").trim();
-  if (!t || t==="-" || t==="¡ª" || t==="--") return null;
+  if (!t || t==="-" || t==="â€”" || t==="--") return null;
   const x = Number(t);
   return Number.isFinite(x) ? x : null;
 }
@@ -316,7 +315,7 @@ function snapshotValid(s) {
   if (!(s.price > 0) || !(s.estimate > 0)) return false;
   if (!Number.isFinite(s.premium) || Math.abs(s.premium) > 200) return false;
 
-  // Æ½Ì¨ÖµÖ»×öĞ£Ñé¡£ÏÔÊ¾×Ö¶ÎÓĞËÄÉáÎåÈë£¬±£Áô 0.40 ¸ö°Ù·ÖµãÈİ²î¡£
+  // å¹³å°å€¼åªåšæ ¡éªŒã€‚æ˜¾ç¤ºå­—æ®µæœ‰å››èˆäº”å…¥ï¼Œä¿ç•™ 0.40 ä¸ªç™¾åˆ†ç‚¹å®¹å·®ã€‚
   if (Number.isFinite(s.platformPremium)) {
     if (Math.abs(s.premium - s.platformPremium) > 0.40) return false;
   }
@@ -687,7 +686,7 @@ async function fetchYahooQqqFullDaily(){
   let start=
     QQQ_STATIC_META.inception;
 
-  // 3ÄêÒ»¶Î£¬±ÜÃâ Yahoo ¶Ô³¬³¤ 1d ÇëÇó×Ô¶¯½µ²ÉÑù³ÉÔÂÏß¡£
+  // 3å¹´ä¸€æ®µï¼Œé¿å… Yahoo å¯¹è¶…é•¿ 1d è¯·æ±‚è‡ªåŠ¨é™é‡‡æ ·æˆæœˆçº¿ã€‚
   while(start<=today){
     let end=
       addUtcYears(
@@ -943,7 +942,7 @@ async function fetchYahooQqq(){
       )
     );
 
-  // ÓÃ½üÆÚÇëÇó¸²¸Ç×îºóÁ½¸öÔÂ£¬È·±£×îĞÂ½»Ò×ÈÕ/µ±Ç°ÈÕÏßÍêÕû¡£
+  // ç”¨è¿‘æœŸè¯·æ±‚è¦†ç›–æœ€åä¸¤ä¸ªæœˆï¼Œç¡®ä¿æœ€æ–°äº¤æ˜“æ—¥/å½“å‰æ—¥çº¿å®Œæ•´ã€‚
   for(const row of recent.rows||[]){
     merged.set(
       row.date,
@@ -986,7 +985,7 @@ async function fetchYahooQqq(){
           latest?.close
         );
 
-  // previousClose ±ØĞëÀ´×Ô×î½üÕæÊµÈÕÏß£¬²»ÔÙÊ¹ÓÃ long-range meta.previousClose¡£
+  // previousClose å¿…é¡»æ¥è‡ªæœ€è¿‘çœŸå®æ—¥çº¿ï¼Œä¸å†ä½¿ç”¨ long-range meta.previousCloseã€‚
   const previousClose=
     Number(
       previous?.close
@@ -1362,11 +1361,11 @@ async function buildQqq({
       new Date().toISOString(),
     fund:{
       ...primary.fund,
-      // QQQ ÒÑÍê³É½á¹¹µ÷Õû£¬µ±Ç°¹Ù·½×Ü·ÑÂÊÎª0.18%¡£
+      // QQQ å·²å®Œæˆç»“æ„è°ƒæ•´ï¼Œå½“å‰å®˜æ–¹æ€»è´¹ç‡ä¸º0.18%ã€‚
       expenseRatio:
         QQQ_STATIC_META.expenseRatio,
-      // QQQ×Ê²ú¹æÄ£ÊÇÊıÇ§ÒÚÃÀÔªÁ¿¼¶¡£
-      // Nasdaq×Ö¶ÎÈôĞ¡ÓÚ100ÒÚÃÀÔª£¬¼«¿ÉÄÜÊÇ shares outstanding µÈÎóÆ¥Åä£¬Ö±½Ó¶ªÆú¡£
+      // QQQèµ„äº§è§„æ¨¡æ˜¯æ•°åƒäº¿ç¾å…ƒé‡çº§ã€‚
+      // Nasdaqå­—æ®µè‹¥å°äº100äº¿ç¾å…ƒï¼Œæå¯èƒ½æ˜¯ shares outstanding ç­‰è¯¯åŒ¹é…ï¼Œç›´æ¥ä¸¢å¼ƒã€‚
       netAssets:
         Number(extra.netAssets)>=1e10
           ?Number(extra.netAssets)
@@ -1483,7 +1482,7 @@ async function fetchEastmoneyETFMap() {
 
 function parseTinyright(html) {
   const text = stripHtml(html);
-  const marketOpen = !(text.includes("A ¹ÉĞİÊĞ") || text.includes("A¹ÉĞİÊĞ"));
+  const marketOpen = !(text.includes("A è‚¡ä¼‘å¸‚") || text.includes("Aè‚¡ä¼‘å¸‚"));
   const rows = html.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) || [];
   const map = new Map();
 
@@ -1519,7 +1518,7 @@ function parseTinyright(html) {
 
 function parseHaoetf(html) {
   const fullText = stripHtml(html);
-  const timeMatch = fullText.match(/Êı¾İ¸üĞÂÊ±¼ä[£º:]\s*([0-9-]+\s+[0-9:]+)/);
+  const timeMatch = fullText.match(/æ•°æ®æ›´æ–°æ—¶é—´[ï¼š:]\s*([0-9-]+\s+[0-9:]+)/);
   const pageTime = timeMatch ? timeMatch[1] : null;
   const rows = html.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) || [];
   const map = new Map();
@@ -1566,7 +1565,7 @@ function parseSnapshotDate(value) {
     );
   }
 
-  m = String(value).match(/(\d{1,2})ÔÂ(\d{1,2})ÈÕ\s+(\d{1,2}):(\d{2})/);
+  m = String(value).match(/(\d{1,2})æœˆ(\d{1,2})æ—¥\s+(\d{1,2}):(\d{2})/);
   if (m) {
     return new Date(now.getFullYear(),Number(m[1])-1,Number(m[2]),Number(m[3]),Number(m[4]),0);
   }
@@ -1648,14 +1647,14 @@ function determineMarketState(rows) {
     dataDateIsToday = newest.dataDate === now.date;
   }
 
-  // Ö»ÓĞ½»Ò×Ê±¶Î + ½ñÌìµÄÊı¾İ + ¿ìÕÕÔÚ 5 ·ÖÖÓÄÚ£¬²ÅÈÏ¶¨ÊÇÕæÊµÊ±¡£
+  // åªæœ‰äº¤æ˜“æ—¶æ®µ + ä»Šå¤©çš„æ•°æ® + å¿«ç…§åœ¨ 5 åˆ†é’Ÿå†…ï¼Œæ‰è®¤å®šæ˜¯çœŸå®æ—¶ã€‚
   if (!weekend && inSession && dataDateIsToday && snapshotAgeMinutes !== null && snapshotAgeMinutes <= 5) {
     return {
       code:"trading",
-      label:"A¹É½»Ò×ÖĞ ¡¤ ÊµÊ±",
+      label:"Aè‚¡äº¤æ˜“ä¸­ Â· å®æ—¶",
       isLive:true,
       isTradingDay:true,
-      reason:"¶«·½²Æ¸»Êı¾İÈÕÆÚÎª½ñÌì£¬ÇÒ×îĞÂ¿ìÕÕ×ã¹»ĞÂ",
+      reason:"ä¸œæ–¹è´¢å¯Œæ•°æ®æ—¥æœŸä¸ºä»Šå¤©ï¼Œä¸”æœ€æ–°å¿«ç…§è¶³å¤Ÿæ–°",
       shanghaiDate:now.date,
       newestDataDate:newest?.dataDate || null,
       newestSnapshotTime:newest?.snapshotTime || null,
@@ -1666,10 +1665,10 @@ function determineMarketState(rows) {
   if (weekend) {
     return {
       code:"closed",
-      label:"ÖÜÄ©ĞİÊĞ ¡¤ ×î½ü½»Ò×Êı¾İ",
+      label:"å‘¨æœ«ä¼‘å¸‚ Â· æœ€è¿‘äº¤æ˜“æ•°æ®",
       isLive:false,
       isTradingDay:false,
-      reason:"µ±Ç°ÎªÖÜÄ©",
+      reason:"å½“å‰ä¸ºå‘¨æœ«",
       shanghaiDate:now.date,
       newestDataDate:newest?.dataDate || null,
       newestSnapshotTime:newest?.snapshotTime || null,
@@ -1677,15 +1676,15 @@ function determineMarketState(rows) {
     };
   }
 
-  // ¹¤×÷ÈÕµ«±¾Ó¦½»Ò×£¬¶«·½²Æ¸» dataDate ²»ÊÇ½ñÌì£º
-  // Õâ»ù±¾¾ÍÊÇ·¨¶¨½Ú¼ÙÈÕ/ÁÙÊ±ĞİÊĞ£¬»òÉÏÓÎÃ»ÓĞ½ñÌìĞĞÇé¡£
+  // å·¥ä½œæ—¥ä½†æœ¬åº”äº¤æ˜“ï¼Œä¸œæ–¹è´¢å¯Œ dataDate ä¸æ˜¯ä»Šå¤©ï¼š
+  // è¿™åŸºæœ¬å°±æ˜¯æ³•å®šèŠ‚å‡æ—¥/ä¸´æ—¶ä¼‘å¸‚ï¼Œæˆ–ä¸Šæ¸¸æ²¡æœ‰ä»Šå¤©è¡Œæƒ…ã€‚
   if (inSession && !dataDateIsToday) {
     return {
       code:"holiday_or_closed",
-      label:"A¹ÉĞİÊĞ/ÎŞµ±ÈÕĞĞÇé ¡¤ ×î½ü½»Ò×Êı¾İ",
+      label:"Aè‚¡ä¼‘å¸‚/æ— å½“æ—¥è¡Œæƒ… Â· æœ€è¿‘äº¤æ˜“æ•°æ®",
       isLive:false,
       isTradingDay:false,
-      reason:"µ±Ç°´¦ÓÚÍ¨³£½»Ò×Ê±¶Î£¬µ«¶«·½²Æ¸»Êı¾İÈÕÆÚ²»ÊÇ½ñÌì",
+      reason:"å½“å‰å¤„äºé€šå¸¸äº¤æ˜“æ—¶æ®µï¼Œä½†ä¸œæ–¹è´¢å¯Œæ•°æ®æ—¥æœŸä¸æ˜¯ä»Šå¤©",
       shanghaiDate:now.date,
       newestDataDate:newest?.dataDate || null,
       newestSnapshotTime:newest?.snapshotTime || null,
@@ -1693,18 +1692,18 @@ function determineMarketState(rows) {
     };
   }
 
-  // Êı¾İÈÕÆÚÊÇ½ñÌì£¬µ«µ±Ç°´¦ÔÚÎçĞİ/ÅÌÇ°/ÅÌºó¡£
+  // æ•°æ®æ—¥æœŸæ˜¯ä»Šå¤©ï¼Œä½†å½“å‰å¤„åœ¨åˆä¼‘/ç›˜å‰/ç›˜åã€‚
   if (dataDateIsToday) {
-    let label = "·Ç½»Ò×Ê±¶Î ¡¤ ×î½ü½»Ò×Êı¾İ";
+    let label = "éäº¤æ˜“æ—¶æ®µ Â· æœ€è¿‘äº¤æ˜“æ•°æ®";
     let code = "closed";
     if (beforeOpen) {
-      label = "ÅÌÇ° ¡¤ ÏÔÊ¾×î½ü½»Ò×Êı¾İ";
+      label = "ç›˜å‰ Â· æ˜¾ç¤ºæœ€è¿‘äº¤æ˜“æ•°æ®";
       code = "premarket";
     } else if (lunch) {
-      label = "Îç¼äĞİÊĞ ¡¤ ÏÔÊ¾ÉÏÎçÊÕÅÌ¸½½üÊı¾İ";
+      label = "åˆé—´ä¼‘å¸‚ Â· æ˜¾ç¤ºä¸Šåˆæ”¶ç›˜é™„è¿‘æ•°æ®";
       code = "lunch";
     } else if (afterClose) {
-      label = "ÒÑÊÕÅÌ ¡¤ ÏÔÊ¾½ñÈÕ×îºó½»Ò×Êı¾İ";
+      label = "å·²æ”¶ç›˜ Â· æ˜¾ç¤ºä»Šæ—¥æœ€åäº¤æ˜“æ•°æ®";
       code = "postmarket";
     }
 
@@ -1713,7 +1712,7 @@ function determineMarketState(rows) {
       label,
       isLive:false,
       isTradingDay:true,
-      reason:"¶«·½²Æ¸»Êı¾İÈÕÆÚÎª½ñÌì£¬µ«µ±Ç°²»´¦ÓÚÁ¬Ğø½»Ò×Ê±¶Î",
+      reason:"ä¸œæ–¹è´¢å¯Œæ•°æ®æ—¥æœŸä¸ºä»Šå¤©ï¼Œä½†å½“å‰ä¸å¤„äºè¿ç»­äº¤æ˜“æ—¶æ®µ",
       shanghaiDate:now.date,
       newestDataDate:newest?.dataDate || null,
       newestSnapshotTime:newest?.snapshotTime || null,
@@ -1723,10 +1722,10 @@ function determineMarketState(rows) {
 
   return {
     code:"closed",
-    label:"·Ç½»Ò×Ê±¶Î ¡¤ ×î½üÓĞĞ§½»Ò×Êı¾İ",
+    label:"éäº¤æ˜“æ—¶æ®µ Â· æœ€è¿‘æœ‰æ•ˆäº¤æ˜“æ•°æ®",
     isLive:false,
     isTradingDay:false,
-    reason:"Ã»ÓĞ¼ì²âµ½½ñÌìµÄ¶«·½²Æ¸»½»Ò×¿ìÕÕ",
+    reason:"æ²¡æœ‰æ£€æµ‹åˆ°ä»Šå¤©çš„ä¸œæ–¹è´¢å¯Œäº¤æ˜“å¿«ç…§",
     shanghaiDate:now.date,
     newestDataDate:newest?.dataDate || null,
     newestSnapshotTime:newest?.snapshotTime || null,
@@ -2387,15 +2386,15 @@ function amountText(v, state="unknown") {
   if (hasFiniteValue(v)) {
     const n = Number(v);
     if (n >= 10000 && Math.abs(n/10000-Math.round(n/10000)) < 1e-9) {
-      return `${Math.round(n/10000)}ÍòÔª/ÈÕ`;
+      return `${Math.round(n/10000)}ä¸‡å…ƒ/æ—¥`;
     }
-    return `${n}Ôª/ÈÕ`;
+    return `${n}å…ƒ/æ—¥`;
   }
-  if (state === "suspended") return "ÔİÍ£Éê¹º";
-  if (state === "open") return "Õı³£Éê¹º";
-  if (state === "unavailable") return "ÎŞ´ËÇşµÀ";
-  if (state === "limited") return "ÏŞ¶î£¨½ğ¶îÎ´½âÎö£©";
-  return "¹«¸æÎ´µ¥¶ÀÅûÂ¶";
+  if (state === "suspended") return "æš‚åœç”³è´­";
+  if (state === "open") return "æ­£å¸¸ç”³è´­";
+  if (state === "unavailable") return "æ— æ­¤æ¸ é“";
+  if (state === "limited") return "é™é¢ï¼ˆé‡‘é¢æœªè§£æï¼‰";
+  return "å…¬å‘Šæœªå•ç‹¬æŠ«éœ²";
 }
 
 function noticePdfUrl(id) {
@@ -2408,7 +2407,7 @@ function noticeListPage(mainCode) {
 
 function normalizeNoticeDate(v) {
   const s = String(v ?? "");
-  const m = s.match(/(20\d{2})[-\/Äê](\d{1,2})[-\/ÔÂ](\d{1,2})/);
+  const m = s.match(/(20\d{2})[-\/å¹´](\d{1,2})[-\/æœˆ](\d{1,2})/);
   if (!m) return null;
   return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
 }
@@ -2425,9 +2424,9 @@ function extractDateByRegex(text, regex) {
 function normalizeNoticeText(v) {
   return stripHtml(String(v ?? ""))
     .replace(/\u00a0/g," ")
-    .replace(/[£º©s]/g,":")
-    .replace(/[£¨]/g,"(")
-    .replace(/[£©]/g,")")
+    .replace(/[ï¼šï¹•]/g,":")
+    .replace(/[ï¼ˆ]/g,"(")
+    .replace(/[ï¼‰]/g,")")
     .replace(/\s+/g," ")
     .trim();
 }
@@ -2437,11 +2436,11 @@ function titleTemporaryDate(title) {
   return (
     extractDateByRegex(
       t,
-      /(?:¹ØÓÚÆìÏÂ²¿·Ö»ù½ğ)?\s*(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕÔİÍ£(?:Éê¹º|Êê»Ø|×ª»»|¶¨ÆÚ¶¨¶î)/
+      /(?:å…³äºæ——ä¸‹éƒ¨åˆ†åŸºé‡‘)?\s*(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥æš‚åœ(?:ç”³è´­|èµå›|è½¬æ¢|å®šæœŸå®šé¢)/
     ) ||
     extractDateByRegex(
       t,
-      /(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ(?:ÔİÍ£|ĞİÊĞ)/
+      /(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥(?:æš‚åœ|ä¼‘å¸‚)/
     )
   );
 }
@@ -2449,35 +2448,35 @@ function titleTemporaryDate(title) {
 function isAnnualHolidaySchedule(title) {
   const t = normalizeNoticeText(title);
   return (
-    /20\d{2}Äê.*(?:¾³ÍâÖ÷ÒªÊĞ³¡|Ö÷Òª¾³ÍâÊĞ³¡).*½Ú¼ÙÈÕ.*ÔİÍ£/.test(t) ||
-    /20\d{2}Äê¶È.*½Ú¼ÙÈÕ.*ÔİÍ£/.test(t) ||
-    /È«Äê.*½Ú¼ÙÈÕ.*ÔİÍ£/.test(t)
+    /20\d{2}å¹´.*(?:å¢ƒå¤–ä¸»è¦å¸‚åœº|ä¸»è¦å¢ƒå¤–å¸‚åœº).*èŠ‚å‡æ—¥.*æš‚åœ/.test(t) ||
+    /20\d{2}å¹´åº¦.*èŠ‚å‡æ—¥.*æš‚åœ/.test(t) ||
+    /å…¨å¹´.*èŠ‚å‡æ—¥.*æš‚åœ/.test(t)
   );
 }
 
 function isQuotaNoticeTitle(title) {
   const t = normalizeNoticeText(title);
 
-  if (!/(Éê¹º|¶¨ÆÚ¶¨¶î|¶¨Í¶)/.test(t)) return false;
-  if (!/(´ó¶î|ÏŞÖÆ|ÔİÍ£|»Ö¸´|µ÷Õû)/.test(t)) return false;
+  if (!/(ç”³è´­|å®šæœŸå®šé¢|å®šæŠ•)/.test(t)) return false;
+  if (!/(å¤§é¢|é™åˆ¶|æš‚åœ|æ¢å¤|è°ƒæ•´)/.test(t)) return false;
 
-  // ÓëÃ¿ÈÕ¶î¶ÈÎŞ¹Ø¡£
+  // ä¸æ¯æ—¥é¢åº¦æ— å…³ã€‚
   if (
-    /ÖÕÖ¹.*ÏúÊÛ|ÏúÊÛÒµÎñ.*ÖÕÖ¹|·ÑÂÊÓÅ»İ|Ôö¼Ó.*ÏúÊÛ»ú¹¹/.test(t)
+    /ç»ˆæ­¢.*é”€å”®|é”€å”®ä¸šåŠ¡.*ç»ˆæ­¢|è´¹ç‡ä¼˜æƒ |å¢åŠ .*é”€å”®æœºæ„/.test(t)
   ) {
     return false;
   }
 
-  // ¡°Éê¹º/¶¨Í¶Æğµãµ÷Õû¡±Ö»ÊÇ×îµÍÉê¹º½ğ¶î£¬²»ÊÇÃ¿ÈÕÉê¹º¶î¶È£¬
-  // ²»ÄÜÄÃÀ´ÑéÖ¤¡°ÏŞ¶î/ÔİÍ£Éê¹º¡±×´Ì¬¡£
+  // â€œç”³è´­/å®šæŠ•èµ·ç‚¹è°ƒæ•´â€åªæ˜¯æœ€ä½ç”³è´­é‡‘é¢ï¼Œä¸æ˜¯æ¯æ—¥ç”³è´­é¢åº¦ï¼Œ
+  // ä¸èƒ½æ‹¿æ¥éªŒè¯â€œé™é¢/æš‚åœç”³è´­â€çŠ¶æ€ã€‚
   if (
-    /(?:Éê¹º|¶¨Í¶|¶¨ÆÚ¶¨¶î).{0,16}(?:Æğµã|×îµÍ½ğ¶î|×îµÍÉê¹º)/.test(t) ||
-    /(?:Æğµã|×îµÍ½ğ¶î|×îµÍÉê¹º).{0,16}(?:Éê¹º|¶¨Í¶|¶¨ÆÚ¶¨¶î)/.test(t)
+    /(?:ç”³è´­|å®šæŠ•|å®šæœŸå®šé¢).{0,16}(?:èµ·ç‚¹|æœ€ä½é‡‘é¢|æœ€ä½ç”³è´­)/.test(t) ||
+    /(?:èµ·ç‚¹|æœ€ä½é‡‘é¢|æœ€ä½ç”³è´­).{0,16}(?:ç”³è´­|å®šæŠ•|å®šæœŸå®šé¢)/.test(t)
   ) {
     return false;
   }
 
-  // Äê¶È½Ú¼ÙÈÕ¼Æ»®±í²»ÊÇ³ÖĞøĞÔµÄ¶î¶È×´Ì¬£¬²»ÄÜÄÃÀ´¸²¸ÇÈ«Äê¡£
+  // å¹´åº¦èŠ‚å‡æ—¥è®¡åˆ’è¡¨ä¸æ˜¯æŒç»­æ€§çš„é¢åº¦çŠ¶æ€ï¼Œä¸èƒ½æ‹¿æ¥è¦†ç›–å…¨å¹´ã€‚
   if (isAnnualHolidaySchedule(t)) return false;
 
   return true;
@@ -2487,9 +2486,9 @@ function noticeScope(title) {
   const t = normalizeNoticeText(title);
 
   const direct =
-    /Ö±Ïú|»ù½ğ¹ÜÀíÈËÖ±Ïú|Ö±Ïúµç×Ó½»Ò×Æ½Ì¨|ÍøÉÏÖ±Ïú|Ö±Ïú¹ñÌ¨/.test(t);
+    /ç›´é”€|åŸºé‡‘ç®¡ç†äººç›´é”€|ç›´é”€ç”µå­äº¤æ˜“å¹³å°|ç½‘ä¸Šç›´é”€|ç›´é”€æŸœå°/.test(t);
   const agency =
-    /´úÏú|·ÇÖ±Ïú|ÆäËûÏúÊÛ»ú¹¹|¸÷ÏúÊÛ»ú¹¹/.test(t);
+    /ä»£é”€|éç›´é”€|å…¶ä»–é”€å”®æœºæ„|å„é”€å”®æœºæ„/.test(t);
 
   if (direct && !agency) return "direct";
   if (agency && !direct) return "agency";
@@ -2571,18 +2570,18 @@ async function fetchAnnouncementContent(id) {
     j?.Data?.notice_content ??
     "";
 
-  if (!content) throw new Error(`¹«¸æÕıÎÄÎª¿Õ: ${id}`);
+  if (!content) throw new Error(`å…¬å‘Šæ­£æ–‡ä¸ºç©º: ${id}`);
   return normalizeNoticeText(content);
 }
 
 function extractGeneralLimit(text) {
   const patterns = [
-    /ÏŞÖÆÉê¹º½ğ¶î[^0-9]{0,80}([0-9][0-9,.]*)/,
-    /´ó¶îÉê¹º[^¡££»]{0,120}?ÏŞ¶î[^0-9]{0,40}([0-9][0-9,.]*)\s*Ôª/,
-    /ÏŞ¶î(?:µ÷Õû)?(?:Îª|ÖÁ)\s*([0-9][0-9,.]*)\s*Ôª/,
-    /Éê¹º¼°¶¨ÆÚ¶¨¶îÍ¶×Ê[^¡££»]{0,120}?(?:²»³¬¹ı|²»µÃ³¬¹ı|ÉÏÏŞÎª)\s*([0-9][0-9,.]*)\s*Ôª/,
-    /µ¥ÈÕµ¥¸ö»ù½ğÕË»§[^¡££»]{0,140}?(?:²»³¬¹ı|²»µÃ³¬¹ı|ÉÏÏŞÎª)\s*([0-9][0-9,.]*)\s*Ôª/,
-    /µ¥ÈÕ[^¡££»]{0,100}?(?:ÀÛ¼Æ)?(?:Éê¹º|¶¨ÆÚ¶¨¶î)[^¡££»]{0,100}?(?:²»³¬¹ı|²»µÃ³¬¹ı|ÉÏÏŞ(?:Îª)?|ÏŞ¶îÎª)\s*([0-9][0-9,.]*)\s*Ôª/
+    /é™åˆ¶ç”³è´­é‡‘é¢[^0-9]{0,80}([0-9][0-9,.]*)/,
+    /å¤§é¢ç”³è´­[^ã€‚ï¼›]{0,120}?é™é¢[^0-9]{0,40}([0-9][0-9,.]*)\s*å…ƒ/,
+    /é™é¢(?:è°ƒæ•´)?(?:ä¸º|è‡³)\s*([0-9][0-9,.]*)\s*å…ƒ/,
+    /ç”³è´­åŠå®šæœŸå®šé¢æŠ•èµ„[^ã€‚ï¼›]{0,120}?(?:ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡|ä¸Šé™ä¸º)\s*([0-9][0-9,.]*)\s*å…ƒ/,
+    /å•æ—¥å•ä¸ªåŸºé‡‘è´¦æˆ·[^ã€‚ï¼›]{0,140}?(?:ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡|ä¸Šé™ä¸º)\s*([0-9][0-9,.]*)\s*å…ƒ/,
+    /å•æ—¥[^ã€‚ï¼›]{0,100}?(?:ç´¯è®¡)?(?:ç”³è´­|å®šæœŸå®šé¢)[^ã€‚ï¼›]{0,100}?(?:ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡|ä¸Šé™(?:ä¸º)?|é™é¢ä¸º)\s*([0-9][0-9,.]*)\s*å…ƒ/
   ];
 
   for (const p of patterns) {
@@ -2597,13 +2596,13 @@ function extractGeneralLimit(text) {
 
 function extractChannelLimit(text, channel) {
   const directPatterns = [
-    /(?:Ö±Ïúµç×Ó½»Ò×Æ½Ì¨|Ö±ÏúÇşµÀ|Ö±Ïú»ú¹¹|Ö±Ïú¹ñÌ¨|Ö±ÏúÆ½Ì¨|Ö±ÏúÖĞĞÄ|ÍøÉÏÖ±Ïú|±¾¹«Ë¾Ö±Ïú|»ù½ğ¹ÜÀíÈËÖ±Ïú)[^¡££»]{0,220}?(?:²»³¬¹ı|²»µÃ³¬¹ı|ÉÏÏŞ(?:Îª|µ÷ÕûÎª)?|ÀÛ¼Æ½ğ¶î(?:Ó¦)?²»³¬¹ı|ÏŞ¶î(?:Îª|µ÷ÕûÎª)?)\s*([0-9][0-9,.]*)\s*Ôª/,
-    /Í¨¹ı±¾¹«Ë¾(?:ÍøÉÏ)?Ö±Ïú[^¡££»]{0,220}?(?:²»³¬¹ı|²»µÃ³¬¹ı)\s*([0-9][0-9,.]*)\s*Ôª/
+    /(?:ç›´é”€ç”µå­äº¤æ˜“å¹³å°|ç›´é”€æ¸ é“|ç›´é”€æœºæ„|ç›´é”€æŸœå°|ç›´é”€å¹³å°|ç›´é”€ä¸­å¿ƒ|ç½‘ä¸Šç›´é”€|æœ¬å…¬å¸ç›´é”€|åŸºé‡‘ç®¡ç†äººç›´é”€)[^ã€‚ï¼›]{0,220}?(?:ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡|ä¸Šé™(?:ä¸º|è°ƒæ•´ä¸º)?|ç´¯è®¡é‡‘é¢(?:åº”)?ä¸è¶…è¿‡|é™é¢(?:ä¸º|è°ƒæ•´ä¸º)?)\s*([0-9][0-9,.]*)\s*å…ƒ/,
+    /é€šè¿‡æœ¬å…¬å¸(?:ç½‘ä¸Š)?ç›´é”€[^ã€‚ï¼›]{0,220}?(?:ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡)\s*([0-9][0-9,.]*)\s*å…ƒ/
   ];
 
   const agencyPatterns = [
-    /(?:´úÏú»ú¹¹|´úÏúÇşµÀ|´úÏú|¸÷´úÏú»ú¹¹|·ÇÖ±Ïú(?:ÏúÊÛ)?»ú¹¹|ÆäËûÏúÊÛ»ú¹¹|³ıÖ±Ïú[^¡££»]{0,50}ÏúÊÛ»ú¹¹)[^¡££»]{0,220}?(?:²»³¬¹ı|²»µÃ³¬¹ı|ÉÏÏŞ(?:Îª|µ÷ÕûÎª)?|ÀÛ¼Æ½ğ¶î(?:Ó¦)?²»³¬¹ı|ÏŞ¶î(?:Îª|µ÷ÕûÎª)?)\s*([0-9][0-9,.]*)\s*Ôª/,
-    /Í¨¹ı(?:¸÷)?(?:´úÏú|ÆäËûÏúÊÛ)»ú¹¹[^¡££»]{0,220}?(?:²»³¬¹ı|²»µÃ³¬¹ı)\s*([0-9][0-9,.]*)\s*Ôª/
+    /(?:ä»£é”€æœºæ„|ä»£é”€æ¸ é“|ä»£é”€|å„ä»£é”€æœºæ„|éç›´é”€(?:é”€å”®)?æœºæ„|å…¶ä»–é”€å”®æœºæ„|é™¤ç›´é”€[^ã€‚ï¼›]{0,50}é”€å”®æœºæ„)[^ã€‚ï¼›]{0,220}?(?:ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡|ä¸Šé™(?:ä¸º|è°ƒæ•´ä¸º)?|ç´¯è®¡é‡‘é¢(?:åº”)?ä¸è¶…è¿‡|é™é¢(?:ä¸º|è°ƒæ•´ä¸º)?)\s*([0-9][0-9,.]*)\s*å…ƒ/,
+    /é€šè¿‡(?:å„)?(?:ä»£é”€|å…¶ä»–é”€å”®)æœºæ„[^ã€‚ï¼›]{0,220}?(?:ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡)\s*([0-9][0-9,.]*)\s*å…ƒ/
   ];
 
   const patterns = channel === "direct" ? directPatterns : agencyPatterns;
@@ -2621,34 +2620,34 @@ function parseNoticeDates(title, text, publishDate) {
   const source = `${title} ${text}`;
 
   const effective =
-    extractDateByRegex(source,/µ÷Õû´ó¶îÉê¹ºÆğÊ¼ÈÕ[^0-9]{0,30}(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ/) ||
-    extractDateByRegex(source,/ÔİÍ£´ó¶îÉê¹ºÆğÊ¼ÈÕ[^0-9]{0,30}(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ/) ||
-    extractDateByRegex(source,/ÔİÍ£Éê¹ºÆğÊ¼ÈÕ[^0-9]{0,30}(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ/) ||
-    extractDateByRegex(source,/»Ö¸´Éê¹ºÆğÊ¼ÈÕ[^0-9]{0,30}(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ/) ||
-    extractDateByRegex(source,/»Ö¸´´ó¶îÉê¹ºÆğÊ¼ÈÕ[^0-9]{0,30}(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ/) ||
+    extractDateByRegex(source,/è°ƒæ•´å¤§é¢ç”³è´­èµ·å§‹æ—¥[^0-9]{0,30}(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥/) ||
+    extractDateByRegex(source,/æš‚åœå¤§é¢ç”³è´­èµ·å§‹æ—¥[^0-9]{0,30}(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥/) ||
+    extractDateByRegex(source,/æš‚åœç”³è´­èµ·å§‹æ—¥[^0-9]{0,30}(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥/) ||
+    extractDateByRegex(source,/æ¢å¤ç”³è´­èµ·å§‹æ—¥[^0-9]{0,30}(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥/) ||
+    extractDateByRegex(source,/æ¢å¤å¤§é¢ç”³è´­èµ·å§‹æ—¥[^0-9]{0,30}(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥/) ||
 
-    // ³£¼û¹«¸æĞ´·¨£º
-    // ¡°2025Äê9ÔÂ29ÈÕÆğÔİÍ£Éê¹º¡±
-    // ¡°2026Äê8ÔÂ5ÈÕÆğµ÷Õû´ó¶îÉê¹ºÏŞ¶î¡±
-    // ÕâÒ»¹æÔò±ØĞë·ÅÔÚ publishDate »ØÍËÖ®Ç°£¬·ñÔò»á°Ñ¹«¸æ·¢²¼ÈÕÆÚÎóµ±ÉúĞ§ÈÕ¡£
+    // å¸¸è§å…¬å‘Šå†™æ³•ï¼š
+    // â€œ2025å¹´9æœˆ29æ—¥èµ·æš‚åœç”³è´­â€
+    // â€œ2026å¹´8æœˆ5æ—¥èµ·è°ƒæ•´å¤§é¢ç”³è´­é™é¢â€
+    // è¿™ä¸€è§„åˆ™å¿…é¡»æ”¾åœ¨ publishDate å›é€€ä¹‹å‰ï¼Œå¦åˆ™ä¼šæŠŠå…¬å‘Šå‘å¸ƒæ—¥æœŸè¯¯å½“ç”Ÿæ•ˆæ—¥ã€‚
     extractDateByRegex(
       source,
-      /(?:×Ô|´Ó)?\s*(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ\s*(?:Æğ|¿ªÊ¼)(?=[£¬,¡££»;\s]|Ö´ĞĞ|ÊµÊ©|ÉúĞ§|µ÷Õû|ÔİÍ£|»Ö¸´|°ìÀí|ÏŞÖÆ)/
+      /(?:è‡ª|ä»)?\s*(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥\s*(?:èµ·|å¼€å§‹)(?=[ï¼Œ,ã€‚ï¼›;\s]|æ‰§è¡Œ|å®æ–½|ç”Ÿæ•ˆ|è°ƒæ•´|æš‚åœ|æ¢å¤|åŠç†|é™åˆ¶)/
     ) ||
 
-    extractDateByRegex(source,/×Ô\s*(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ(?:Æğ|¿ªÊ¼)/) ||
+    extractDateByRegex(source,/è‡ª\s*(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥(?:èµ·|å¼€å§‹)/) ||
     publishDate;
 
   const resume =
-    extractDateByRegex(source,/»Ö¸´(?:Éê¹º|Ïà¹ØÒµÎñ|°ìÀíÉê¹º)[^0-9]{0,80}(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ/) ||
-    extractDateByRegex(source,/ÓÚ\s*(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ»Ö¸´(?:Éê¹º|Ïà¹ØÒµÎñ)/) ||
-    extractDateByRegex(source,/(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕ(?:Æğ)?»Ö¸´(?:Éê¹º|Êê»Ø|×ª»»|¶¨ÆÚ¶¨¶î)/);
+    extractDateByRegex(source,/æ¢å¤(?:ç”³è´­|ç›¸å…³ä¸šåŠ¡|åŠç†ç”³è´­)[^0-9]{0,80}(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥/) ||
+    extractDateByRegex(source,/äº\s*(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥æ¢å¤(?:ç”³è´­|ç›¸å…³ä¸šåŠ¡)/) ||
+    extractDateByRegex(source,/(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥(?:èµ·)?æ¢å¤(?:ç”³è´­|èµå›|è½¬æ¢|å®šæœŸå®šé¢)/);
 
   const temporary =
     titleTemporaryDate(title) ||
     extractDateByRegex(
       source,
-      /(?:½öÓÚ|ÓÚ)\s*(20\d{2})Äê(\d{1,2})ÔÂ(\d{1,2})ÈÕÔİÍ£(?:Éê¹º|Êê»Ø|×ª»»|¶¨ÆÚ¶¨¶î)/
+      /(?:ä»…äº|äº)\s*(20\d{2})å¹´(\d{1,2})æœˆ(\d{1,2})æ—¥æš‚åœ(?:ç”³è´­|èµå›|è½¬æ¢|å®šæœŸå®šé¢)/
     );
 
   return {
@@ -2664,7 +2663,7 @@ function extractAffectedShareClasses(title, text) {
   const classes = new Set();
 
   for (const source of [titleNorm,head]) {
-    for (const m of source.matchAll(/([ACDEFI])\s*Àà/g)) {
+    for (const m of source.matchAll(/([ACDEFI])\s*ç±»/g)) {
       classes.add(m[1]);
     }
   }
@@ -2689,11 +2688,11 @@ function parseNoticeState(notice, text, product) {
   const dates = parseNoticeDates(title,text,notice.publishDate);
 
   const fullSuspend =
-    (/ÔİÍ£Éê¹º/.test(title) && !/ÔİÍ£´ó¶îÉê¹º/.test(title)) ||
+    (/æš‚åœç”³è´­/.test(title) && !/æš‚åœå¤§é¢ç”³è´­/.test(title)) ||
     (
-      /ÔİÍ£(?:°ìÀí)?Éê¹º/.test(full) &&
-      !/ÔİÍ£´ó¶îÉê¹º/.test(title) &&
-      /ÔİÍ£Éê¹º¼°|ÔİÍ£Éê¹º¡¢|ÔİÍ£Éê¹ºÒµÎñ/.test(title)
+      /æš‚åœ(?:åŠç†)?ç”³è´­/.test(full) &&
+      !/æš‚åœå¤§é¢ç”³è´­/.test(title) &&
+      /æš‚åœç”³è´­åŠ|æš‚åœç”³è´­ã€|æš‚åœç”³è´­ä¸šåŠ¡/.test(title)
     );
 
   let state = "unknown";
@@ -2704,13 +2703,13 @@ function parseNoticeState(notice, text, product) {
     hasFiniteValue(generalLimit) ||
     hasFiniteValue(directLimit) ||
     hasFiniteValue(agencyLimit) ||
-    /(?:ÏŞÖÆ|ÔİÍ£|µ÷Õû).*´ó¶îÉê¹º/.test(title) ||
-    /´ó¶îÉê¹º.*(?:ÏŞÖÆ|ÔİÍ£|µ÷Õû)/.test(title)
+    /(?:é™åˆ¶|æš‚åœ|è°ƒæ•´).*å¤§é¢ç”³è´­/.test(title) ||
+    /å¤§é¢ç”³è´­.*(?:é™åˆ¶|æš‚åœ|è°ƒæ•´)/.test(title)
   ) {
     state = "limited";
   } else if (
-    /»Ö¸´(?:Õı³£)?Éê¹º/.test(title) ||
-    /»Ö¸´´ó¶îÉê¹º/.test(title)
+    /æ¢å¤(?:æ­£å¸¸)?ç”³è´­/.test(title) ||
+    /æ¢å¤å¤§é¢ç”³è´­/.test(title)
   ) {
     state = "open";
   }
@@ -2727,7 +2726,7 @@ function parseNoticeState(notice, text, product) {
     effectiveDate:dates.effectiveDate,
     resumeDate:dates.resumeDate,
     temporaryDate:dates.temporaryDate,
-    isHoliday:/½Ú¼ÙÈÕ|¾³ÍâÖ÷ÒªÍ¶×Ê³¡Ëù/.test(title),
+    isHoliday:/èŠ‚å‡æ—¥|å¢ƒå¤–ä¸»è¦æŠ•èµ„åœºæ‰€/.test(title),
     state,
     generalLimit,
     agencyLimit,
@@ -2750,12 +2749,12 @@ function isoDaysAgo(dateStr, days) {
 function noticeApplicable(parsed, today) {
   if (parsed.effectiveDate && today < parsed.effectiveDate) return false;
 
-  // ¡°Ä³ÄêÄ³ÔÂÄ³ÈÕÔİÍ£¡±µÄµ¥ÈÕ¹«¸æÖ»ÔÚ¸ÃÌìÓĞĞ§¡£
+  // â€œæŸå¹´æŸæœˆæŸæ—¥æš‚åœâ€çš„å•æ—¥å…¬å‘Šåªåœ¨è¯¥å¤©æœ‰æ•ˆã€‚
   if (parsed.temporaryDate) return today === parsed.temporaryDate;
 
   if (parsed.resumeDate && today >= parsed.resumeDate) return false;
 
-  // ÎŞ·¨½âÎö»Ö¸´ÈÕÆÚµÄ¾É½Ú¼ÙÈÕÔİÍ££¬½ûÖ¹³¤ÆÚ¸²¸Çµ±Ç°¶î¶È¡£
+  // æ— æ³•è§£ææ¢å¤æ—¥æœŸçš„æ—§èŠ‚å‡æ—¥æš‚åœï¼Œç¦æ­¢é•¿æœŸè¦†ç›–å½“å‰é¢åº¦ã€‚
   if (parsed.isHoliday && parsed.publishDate) {
     const expiry = isoDaysAgo(parsed.publishDate,14);
     if (expiry && today > expiry) return false;
@@ -2769,11 +2768,11 @@ function shareIsAffected(parsed, meta, product) {
     return parsed.affectedCodes.includes(meta.code);
   }
 
-  if (parsed.affectedClasses?.length && meta.share !== "µ¥Ò»") {
+  if (parsed.affectedClasses?.length && meta.share !== "å•ä¸€") {
     return parsed.affectedClasses.includes(meta.share);
   }
 
-  // ¹«¸æÎ´ÏÔÊ½ÏŞ¶¨·İ¶î -> ÊÓÎªÕû¸ö»ù½ğ²úÆ·¡£
+  // å…¬å‘Šæœªæ˜¾å¼é™å®šä»½é¢ -> è§†ä¸ºæ•´ä¸ªåŸºé‡‘äº§å“ã€‚
   return true;
 }
 
@@ -2797,7 +2796,7 @@ function stateForParsedLimit(parsed, limit) {
   return hasFiniteValue(limit) ? "limited" : "unknown";
 }
 
-// newest -> oldest. ÒÑ¾­ÓÉ½ÏĞÂ¹«¸æÈ·¶¨µÄÇşµÀ²»ÔÊĞí±»¾É¹«¸æ¸²¸Ç¡£
+// newest -> oldest. å·²ç»ç”±è¾ƒæ–°å…¬å‘Šç¡®å®šçš„æ¸ é“ä¸å…è®¸è¢«æ—§å…¬å‘Šè¦†ç›–ã€‚
 function applyParsedNoticeToShare(target, parsed) {
   const scope = parsed.scope || "general";
 
@@ -2859,27 +2858,27 @@ function combinedShareStatus(s) {
   const a=s.agency.state,d=s.direct.state;
 
   if (a==="suspended" && d==="suspended") {
-    return {status:"suspended",label:"ÔİÍ£Éê¹º"};
+    return {status:"suspended",label:"æš‚åœç”³è´­"};
   }
   if (a==="limited" || d==="limited") {
-    return {status:"limited",label:"ÏŞ¶îÉê¹º"};
+    return {status:"limited",label:"é™é¢ç”³è´­"};
   }
   if (
     (a==="suspended" && (d==="open"||d==="limited")) ||
     (d==="suspended" && (a==="open"||a==="limited"))
   ) {
-    return {status:"mixed",label:"ÇşµÀ×´Ì¬²»Í¬"};
+    return {status:"mixed",label:"æ¸ é“çŠ¶æ€ä¸åŒ"};
   }
   if (a==="open" && d==="open") {
-    return {status:"open",label:"¿ª·ÅÉê¹º"};
+    return {status:"open",label:"å¼€æ”¾ç”³è´­"};
   }
   if (a==="open" || d==="open") {
-    return {status:"open",label:"²¿·ÖÇşµÀ¿ª·Å"};
+    return {status:"open",label:"éƒ¨åˆ†æ¸ é“å¼€æ”¾"};
   }
   if (a==="suspended" || d==="suspended") {
-    return {status:"mixed",label:"²¿·ÖÇşµÀÔİÍ£"};
+    return {status:"mixed",label:"éƒ¨åˆ†æ¸ é“æš‚åœ"};
   }
-  return {status:"missing",label:"¹«¸æÎ´ÍêÕû½âÎö"};
+  return {status:"missing",label:"å…¬å‘Šæœªå®Œæ•´è§£æ"};
 }
 
 async function loadTimedJsonCache(key, maxAgeMs) {
@@ -3111,14 +3110,14 @@ function resultRowsFromResolutions(items,checkDate) {
         announcementTitle:latest?.title||null,
         announcementUrl:latest?.announcementUrl||null,
         announcementId:latest?.id||null,
-        verification:"»ù½ğ¹ÜÀíÈË¹«¸æÔ­ÎÄ",
+        verification:"åŸºé‡‘ç®¡ç†äººå…¬å‘ŠåŸæ–‡",
         limitText:
-          `´úÏú ${amountText(shareState.agency.limit,shareState.agency.state)}£»`+
-          `Ö±Ïú ${amountText(shareState.direct.limit,shareState.direct.state)}`,
+          `ä»£é”€ ${amountText(shareState.agency.limit,shareState.agency.state)}ï¼›`+
+          `ç›´é”€ ${amountText(shareState.direct.limit,shareState.direct.state)}`,
         channelText:
-          `´úÏú£º${amountText(shareState.agency.limit,shareState.agency.state)}£»`+
-          `Ö±Ïú£º${amountText(shareState.direct.limit,shareState.direct.state)}`,
-        source:"»ù½ğ¹ÜÀíÈË¹«¸æ£¨¶«·½²Æ¸»¹«¸æ½Ó¿Ú£©",
+          `ä»£é”€ï¼š${amountText(shareState.agency.limit,shareState.agency.state)}ï¼›`+
+          `ç›´é”€ï¼š${amountText(shareState.direct.limit,shareState.direct.state)}`,
+        source:"åŸºé‡‘ç®¡ç†äººå…¬å‘Šï¼ˆä¸œæ–¹è´¢å¯Œå…¬å‘Šæ¥å£ï¼‰",
         sourceUrl:noticeListPage(r.product.mainCode),
         checkDate,
         dataStatus:item.cached?"cached":"fresh"
@@ -3129,7 +3128,7 @@ function resultRowsFromResolutions(items,checkDate) {
   return OTC_CNY_META.map(meta=>byCode.get(meta.code)||({
     ...meta,
     status:"missing",
-    statusLabel:"¹«¸æ¶ÁÈ¡Ê§°Ü",
+    statusLabel:"å…¬å‘Šè¯»å–å¤±è´¥",
     agencyLimit:null,
     directLimit:null,
     agencyState:"unknown",
@@ -3140,10 +3139,10 @@ function resultRowsFromResolutions(items,checkDate) {
     announcementTitle:null,
     announcementUrl:null,
     announcementId:null,
-    verification:"»ù½ğ¹ÜÀíÈË¹«¸æÔ­ÎÄ",
-    limitText:"´úÏú ¹«¸æÎ´µ¥¶ÀÅûÂ¶£»Ö±Ïú ¹«¸æÎ´µ¥¶ÀÅûÂ¶",
-    channelText:"´úÏú£º¹«¸æÎ´µ¥¶ÀÅûÂ¶£»Ö±Ïú£º¹«¸æÎ´µ¥¶ÀÅûÂ¶",
-    source:"»ù½ğ¹ÜÀíÈË¹«¸æ£¨¶«·½²Æ¸»¹«¸æ½Ó¿Ú£©",
+    verification:"åŸºé‡‘ç®¡ç†äººå…¬å‘ŠåŸæ–‡",
+    limitText:"ä»£é”€ å…¬å‘Šæœªå•ç‹¬æŠ«éœ²ï¼›ç›´é”€ å…¬å‘Šæœªå•ç‹¬æŠ«éœ²",
+    channelText:"ä»£é”€ï¼šå…¬å‘Šæœªå•ç‹¬æŠ«éœ²ï¼›ç›´é”€ï¼šå…¬å‘Šæœªå•ç‹¬æŠ«éœ²",
+    source:"åŸºé‡‘ç®¡ç†äººå…¬å‘Šï¼ˆä¸œæ–¹è´¢å¯Œå…¬å‘Šæ¥å£ï¼‰",
     sourceUrl:noticeListPage(
       OTC_PRODUCT_MAP.get(meta.code)?.mainCode||meta.code
     ),
@@ -3164,7 +3163,7 @@ function absoluteUrlHybrid(url,base="https://anxinletech.com") {
 
 function parseYuanAmountHybrid(text) {
   const s=stripHtml(text);
-  const m=s.match(/([0-9]+(?:\.[0-9]+)?)\s*(Íò)?Ôª/);
+  const m=s.match(/([0-9]+(?:\.[0-9]+)?)\s*(ä¸‡)?å…ƒ/);
   if (!m) return null;
   const v=Number(m[1])*(m[2]?10000:1);
   return Number.isFinite(v)?v:null;
@@ -3173,7 +3172,7 @@ function parseYuanAmountHybrid(text) {
 function parseAmountAfterLabelHybrid(text,label) {
   const s=stripHtml(text);
   const re=new RegExp(
-    label+"[^0-9]{0,60}([0-9]+(?:\\.[0-9]+)?)\\s*(Íò)?Ôª"
+    label+"[^0-9]{0,60}([0-9]+(?:\\.[0-9]+)?)\\s*(ä¸‡)?å…ƒ"
   );
   const m=s.match(re);
   if (!m) return null;
@@ -3183,19 +3182,19 @@ function parseAmountAfterLabelHybrid(text,label) {
 
 function normalizeAnxinStatus(statusText) {
   const s=stripHtml(statusText);
-  if (/ÔİÍ£Éê¹º/.test(s)) return {code:"suspended",label:"ÔİÍ£Éê¹º"};
-  if (/ÏŞ´ó¶î|ÏŞ¹º/.test(s)) return {code:"limited",label:"ÏŞ¶îÉê¹º"};
-  if (/¿ª·ÅÉê¹º|Õı³£Éê¹º/.test(s)) return {code:"open",label:"¿ª·ÅÉê¹º"};
-  if (/³¡ÄÚ½»Ò×/.test(s)) return {code:"exchange",label:"³¡ÄÚ½»Ò×"};
-  return {code:"unknown",label:s.replace(/\?.*$/,"").trim()||"Î´Öª"};
+  if (/æš‚åœç”³è´­/.test(s)) return {code:"suspended",label:"æš‚åœç”³è´­"};
+  if (/é™å¤§é¢|é™è´­/.test(s)) return {code:"limited",label:"é™é¢ç”³è´­"};
+  if (/å¼€æ”¾ç”³è´­|æ­£å¸¸ç”³è´­/.test(s)) return {code:"open",label:"å¼€æ”¾ç”³è´­"};
+  if (/åœºå†…äº¤æ˜“/.test(s)) return {code:"exchange",label:"åœºå†…äº¤æ˜“"};
+  return {code:"unknown",label:s.replace(/\?.*$/,"").trim()||"æœªçŸ¥"};
 }
 
 function anxinVerificationLabel(statusText) {
   const s=stripHtml(statusText);
-  if (/¹«¸æÖ±ºË/.test(s)) return "¹«¸æÖ±ºË";
-  if (/ÈË¹¤ºËÊµ/.test(s)) return "ÈË¹¤ºËÊµ";
-  if (/Ë«Ô´Ò»ÖÂ/.test(s)) return "Ë«Ô´Ò»ÖÂ";
-  return "»ã×Ü¿Ú¾¶";
+  if (/å…¬å‘Šç›´æ ¸/.test(s)) return "å…¬å‘Šç›´æ ¸";
+  if (/äººå·¥æ ¸å®/.test(s)) return "äººå·¥æ ¸å®";
+  if (/åŒæºä¸€è‡´/.test(s)) return "åŒæºä¸€è‡´";
+  return "æ±‡æ€»å£å¾„";
 }
 
 function extractAnxinAnnouncementUrl(rowHtml) {
@@ -3213,7 +3212,7 @@ function parseAnxinQuota(limitText,channelText,statusCode) {
 
   if (
     statusCode==="suspended" ||
-    /´úÏúÓëÖ±Ïú¾ùÔİÍ£|¾ùÔİÍ£Éê¹º/.test(joined)
+    /ä»£é”€ä¸ç›´é”€å‡æš‚åœ|å‡æš‚åœç”³è´­/.test(joined)
   ) {
     return {
       agencyLimit:null,
@@ -3224,14 +3223,14 @@ function parseAnxinQuota(limitText,channelText,statusCode) {
     };
   }
 
-  let agencyLimit=parseAmountAfterLabelHybrid(joined,"´úÏú");
-  let directLimit=parseAmountAfterLabelHybrid(joined,"Ö±Ïú");
+  let agencyLimit=parseAmountAfterLabelHybrid(joined,"ä»£é”€");
+  let directLimit=parseAmountAfterLabelHybrid(joined,"ç›´é”€");
 
   const singleLimit=parseYuanAmountHybrid(limit);
   const directOnly=
-    /½ö[^£»¡£]*Ö±Ïú|APPÖ±Ïú|¹ÙÍø[^£»¡£]*Ö±Ïú|Ö±Ïú[^£»¡£]*´úÏúÎŞ|´úÏúÎŞ[^£»¡£]*Ö±Ïú/.test(channel);
-  const agencyPaused=/´úÏú[^£»¡£]*ÔİÍ£/.test(joined);
-  const directPaused=/Ö±Ïú[^£»¡£]*ÔİÍ£/.test(joined);
+    /ä»…[^ï¼›ã€‚]*ç›´é”€|APPç›´é”€|å®˜ç½‘[^ï¼›ã€‚]*ç›´é”€|ç›´é”€[^ï¼›ã€‚]*ä»£é”€æ— |ä»£é”€æ— [^ï¼›ã€‚]*ç›´é”€/.test(channel);
+  const agencyPaused=/ä»£é”€[^ï¼›ã€‚]*æš‚åœ/.test(joined);
+  const directPaused=/ç›´é”€[^ï¼›ã€‚]*æš‚åœ/.test(joined);
 
   if (
     agencyLimit===null &&
@@ -3242,7 +3241,7 @@ function parseAnxinQuota(limitText,channelText,statusCode) {
     else agencyLimit=singleLimit;
   }
 
-  if (statusCode==="open" || /Õı³£Éê¹º/.test(limit)) {
+  if (statusCode==="open" || /æ­£å¸¸ç”³è´­/.test(limit)) {
     return {
       agencyLimit:null,
       directLimit:null,
@@ -3264,10 +3263,10 @@ function parseAnxinQuota(limitText,channelText,statusCode) {
 
   let directInferredFromAgency=false;
 
-  // ÓÃ»§¿Ú¾¶£º
-  // Èç¹ûÖ»ÅûÂ¶Ò»¸öÆÕÍ¨Éê¹º¶î¶È£¬ÇÒÃ»ÓĞµ¥¶ÀÅûÂ¶Ö±Ïú¶î¶È£¬
-  // Ä¬ÈÏÈÏÎªÖ±Ïú¶î¶ÈÓë´úÏú¶î¶ÈÒ»ÖÂ¡£
-  // ¡°½öÖ±Ïú¡±¡°´úÏúÎŞ´Ë¶î¶È¡±µÈÃ÷È·ÇşµÀÀıÍâ²»ÊÊÓÃ´Ë¹æÔò¡£
+  // ç”¨æˆ·å£å¾„ï¼š
+  // å¦‚æœåªæŠ«éœ²ä¸€ä¸ªæ™®é€šç”³è´­é¢åº¦ï¼Œä¸”æ²¡æœ‰å•ç‹¬æŠ«éœ²ç›´é”€é¢åº¦ï¼Œ
+  // é»˜è®¤è®¤ä¸ºç›´é”€é¢åº¦ä¸ä»£é”€é¢åº¦ä¸€è‡´ã€‚
+  // â€œä»…ç›´é”€â€â€œä»£é”€æ— æ­¤é¢åº¦â€ç­‰æ˜ç¡®æ¸ é“ä¾‹å¤–ä¸é€‚ç”¨æ­¤è§„åˆ™ã€‚
   if (
     directLimit===null &&
     agencyLimit!==null &&
@@ -3292,7 +3291,7 @@ function parseAnxinQuota(limitText,channelText,statusCode) {
 
 function parseAnxinLatestDate(html) {
   const flat=stripHtml(html);
-  const m=flat.match(/µ±ÈÕËÙÀÀ\s*[¡¤?]?\s*(\d{4}-\d{2}-\d{2})/);
+  const m=flat.match(/å½“æ—¥é€Ÿè§ˆ\s*[Â·?]?\s*(\d{4}-\d{2}-\d{2})/);
   return m?m[1]:null;
 }
 
@@ -3303,7 +3302,7 @@ function parseAnxinRows(html) {
 
   for (const rowHtml of tableRows) {
     const rowText=stripHtml(rowHtml);
-    const codeMatch=rowText.match(/[£¨(](\d{6})[£©)]/);
+    const codeMatch=rowText.match(/[ï¼ˆ(](\d{6})[ï¼‰)]/);
     if (!codeMatch) continue;
 
     const code=codeMatch[1];
@@ -3315,7 +3314,7 @@ function parseAnxinRows(html) {
     const meta=OTC_CNY_META_MAP.get(code);
     const firstCell=cells[0]||"";
     const dynamicName=
-      firstCell.replace(/[£¨(]\d{6}[£©)]/,"").trim()||meta.name;
+      firstCell.replace(/[ï¼ˆ(]\d{6}[ï¼‰)]/,"").trim()||meta.name;
     const status=normalizeAnxinStatus(cells[1]||"");
     const limitText=cells[2]||"";
     const channelText=cells[3]||"";
@@ -3338,7 +3337,7 @@ function parseAnxinRows(html) {
       sourceAnnouncementUrl:extractAnxinAnnouncementUrl(rowHtml),
       quotaDate,
       ...quota,
-      source:"°²öÎÀÖQDII¶î¶ÈÈÕ±¨",
+      source:"å®‰é‘«ä¹QDIIé¢åº¦æ—¥æŠ¥",
       sourceUrl:ANXINLE_OTC_SOURCE_URL,
       dataStatus:"fresh"
     });
@@ -3347,18 +3346,18 @@ function parseAnxinRows(html) {
   const rows=OTC_CNY_META.map(meta=>found.get(meta.code)||({
     ...meta,
     status:"missing",
-    statusLabel:"°²öÎÀÖÎ´Æ¥Åä",
-    anxinVerification:"Î´Æ¥Åä",
-    limitText:"¡ª",
-    channelText:"¡ª",
-    announcementText:"¡ª",
+    statusLabel:"å®‰é‘«ä¹æœªåŒ¹é…",
+    anxinVerification:"æœªåŒ¹é…",
+    limitText:"â€”",
+    channelText:"â€”",
+    announcementText:"â€”",
     sourceAnnouncementUrl:null,
     quotaDate,
     agencyLimit:null,
     directLimit:null,
     agencyState:"unknown",
     directState:"unknown",
-    source:"°²öÎÀÖQDII¶î¶ÈÈÕ±¨",
+    source:"å®‰é‘«ä¹QDIIé¢åº¦æ—¥æŠ¥",
     sourceUrl:ANXINLE_OTC_SOURCE_URL,
     dataStatus:"missing"
   }));
@@ -3504,7 +3503,7 @@ function comparableChannel(
 
   const checks=[];
 
-  // ¹«¸æÃ÷È·ÔİÍ£/¿ª·ÅÊ±£¬¿ÉÒÔ±È½ÏÇşµÀ×´Ì¬¡£
+  // å…¬å‘Šæ˜ç¡®æš‚åœ/å¼€æ”¾æ—¶ï¼Œå¯ä»¥æ¯”è¾ƒæ¸ é“çŠ¶æ€ã€‚
   if (
     expectedState==="suspended" ||
     expectedState==="open"
@@ -3522,7 +3521,7 @@ function comparableChannel(
     }
   }
 
-  // ÏŞ¶î¹«¸æ£ºÖ»ÔÚ¹«¸æ½âÎöµ½ÁË½ğ¶îÊ±×ö½ğ¶îÓ²±È½Ï¡£
+  // é™é¢å…¬å‘Šï¼šåªåœ¨å…¬å‘Šè§£æåˆ°äº†é‡‘é¢æ—¶åšé‡‘é¢ç¡¬æ¯”è¾ƒã€‚
   if (
     expectedState==="limited" &&
     hasFiniteValue(expectedLimit)
@@ -3559,7 +3558,7 @@ function compareAnnouncementToAnxin(
   ) {
     return {
       status:"unverified",
-      label:"¹«¸æÎ´½âÎö",
+      label:"å…¬å‘Šæœªè§£æ",
       checks:[]
     };
   }
@@ -3569,7 +3568,7 @@ function compareAnnouncementToAnxin(
   if (!shareIsAffected(parsed,row,product)) {
     return {
       status:"not_affected",
-      label:"×îĞÂ¹«¸æÎ´Éæ¼°¸Ã·İ¶î",
+      label:"æœ€æ–°å…¬å‘Šæœªæ¶‰åŠè¯¥ä»½é¢",
       checks:[]
     };
   }
@@ -3577,7 +3576,7 @@ function compareAnnouncementToAnxin(
   if (announcement.timing==="upcoming") {
     return {
       status:"upcoming",
-      label:`${parsed.effectiveDate||"Î´À´ÈÕÆÚ"}ÆğÉúĞ§`,
+      label:`${parsed.effectiveDate||"æœªæ¥æ—¥æœŸ"}èµ·ç”Ÿæ•ˆ`,
       checks:[]
     };
   }
@@ -3585,7 +3584,7 @@ function compareAnnouncementToAnxin(
   if (announcement.timing!=="active") {
     return {
       status:"unverified",
-      label:"×îĞÂ¹«¸æµ±Ç°Î´ÉúĞ§",
+      label:"æœ€æ–°å…¬å‘Šå½“å‰æœªç”Ÿæ•ˆ",
       checks:[]
     };
   }
@@ -3597,8 +3596,8 @@ function compareAnnouncementToAnxin(
 
   const checks=parts.flatMap(x=>x.checks||[]);
 
-  // Èô¹«¸æÖ»½âÎöµ½ÁË¡°ÏŞ¶î/ÔİÍ£¡±µÈ×´Ì¬£¬µ«Ã»½âÎöµ½¿É±È½Ï½ğ¶î£¬
-  // Ê¹ÓÃ²úÆ·×ÜÌå×´Ì¬×öÈíĞ£Ñé¡£
+  // è‹¥å…¬å‘Šåªè§£æåˆ°äº†â€œé™é¢/æš‚åœâ€ç­‰çŠ¶æ€ï¼Œä½†æ²¡è§£æåˆ°å¯æ¯”è¾ƒé‡‘é¢ï¼Œ
+  // ä½¿ç”¨äº§å“æ€»ä½“çŠ¶æ€åšè½¯æ ¡éªŒã€‚
   if (!checks.length) {
     if (
       parsed.state==="limited" &&
@@ -3606,7 +3605,7 @@ function compareAnnouncementToAnxin(
     ) {
       return {
         status:"partial",
-        label:"×´Ì¬Ò»ÖÂ¡¤½ğ¶îÎ´¶ÀÁ¢½âÎö",
+        label:"çŠ¶æ€ä¸€è‡´Â·é‡‘é¢æœªç‹¬ç«‹è§£æ",
         checks:[]
       };
     }
@@ -3617,13 +3616,13 @@ function compareAnnouncementToAnxin(
     ) {
       return {
         status:"match",
-        label:"¹«¸æÒ»ÖÂ",
+        label:"å…¬å‘Šä¸€è‡´",
         checks:[]
       };
     }
     return {
       status:"partial",
-      label:"¹«¸æÒÑ¶ÁÈ¡¡¤¿É±È×Ö¶Î²»×ã",
+      label:"å…¬å‘Šå·²è¯»å–Â·å¯æ¯”å­—æ®µä¸è¶³",
       checks:[]
     };
   }
@@ -3633,13 +3632,13 @@ function compareAnnouncementToAnxin(
   return mismatches.length
     ?{
       status:"mismatch",
-      label:"Óë¹«¸æ²»Ò»ÖÂ",
+      label:"ä¸å…¬å‘Šä¸ä¸€è‡´",
       checks,
       mismatches
     }
     :{
       status:"match",
-      label:"¹«¸æÒ»ÖÂ",
+      label:"å…¬å‘Šä¸€è‡´",
       checks
     };
 }
@@ -3706,7 +3705,7 @@ function extractAnnouncementId(url) {
 function extractTitleAffectedClassesV37(title) {
   const t=normalizeNoticeText(title);
   const out=new Set();
-  for (const m of t.matchAll(/([ACDEFI])\s*Àà/g)) {
+  for (const m of t.matchAll(/([ACDEFI])\s*ç±»/g)) {
     out.add(m[1]);
   }
   return [...out];
@@ -3727,20 +3726,20 @@ function extractGeneralLimitV38(text) {
   const s=normalizeNoticeText(text);
 
   const patterns=[
-    // ¹«¸æ±í¸ñ³£¼û£º¡°ÏŞÖÆÉê¹º½ğ¶î£¨µ¥Î»£ºÈËÃñ±ÒÔª£©10¡±
-    /ÏŞÖÆÉê¹º½ğ¶î[^0-9]{0,160}([0-9][0-9,.]*)\s*(?:ÈËÃñ±Ò)?Ôª?/,
+    // å…¬å‘Šè¡¨æ ¼å¸¸è§ï¼šâ€œé™åˆ¶ç”³è´­é‡‘é¢ï¼ˆå•ä½ï¼šäººæ°‘å¸å…ƒï¼‰10â€
+    /é™åˆ¶ç”³è´­é‡‘é¢[^0-9]{0,160}([0-9][0-9,.]*)\s*(?:äººæ°‘å¸)?å…ƒ?/,
 
-    // ¡°ÀÛ¼Æ½ğ¶îÏŞÖÆµ÷ÕûÎª10Ôª¡±
-    /(?:Éê¹º|¶¨ÆÚ¶¨¶îÍ¶×Ê)[^¡££»]{0,180}?ÀÛ¼Æ½ğ¶îÏŞÖÆµ÷ÕûÎª\s*([0-9][0-9,.]*)\s*(?:ÈËÃñ±Ò)?Ôª/,
+    // â€œç´¯è®¡é‡‘é¢é™åˆ¶è°ƒæ•´ä¸º10å…ƒâ€
+    /(?:ç”³è´­|å®šæœŸå®šé¢æŠ•èµ„)[^ã€‚ï¼›]{0,180}?ç´¯è®¡é‡‘é¢é™åˆ¶è°ƒæ•´ä¸º\s*([0-9][0-9,.]*)\s*(?:äººæ°‘å¸)?å…ƒ/,
 
-    // ¡°½ğ¶î²»Ó¦³¬¹ı10ÈËÃñ±ÒÔª¡±
-    /(?:ÀÛ¼ÆÉê¹º|ÀÛ¼Æ½ğ¶î|Éê¹º¡¢¶¨ÆÚ¶¨¶îÍ¶×ÊµÄ½ğ¶î)[^¡££»]{0,160}?(?:²»Ó¦³¬¹ı|²»³¬¹ı|²»µÃ³¬¹ı|ÉÏÏŞÎª|ÏŞÖÆÎª)\s*([0-9][0-9,.]*)\s*(?:ÈËÃñ±Ò)?Ôª/,
+    // â€œé‡‘é¢ä¸åº”è¶…è¿‡10äººæ°‘å¸å…ƒâ€
+    /(?:ç´¯è®¡ç”³è´­|ç´¯è®¡é‡‘é¢|ç”³è´­ã€å®šæœŸå®šé¢æŠ•èµ„çš„é‡‘é¢)[^ã€‚ï¼›]{0,160}?(?:ä¸åº”è¶…è¿‡|ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡|ä¸Šé™ä¸º|é™åˆ¶ä¸º)\s*([0-9][0-9,.]*)\s*(?:äººæ°‘å¸)?å…ƒ/,
 
-    // ¡°ÀÛ¼Æ¸ßÓÚ10ÔªµÄÉê¹ºÒµÎñ½øĞĞÏŞÖÆ¡±
-    /(?:µ¥±Ê»ò¶à±ÊÀÛ¼Æ|ÀÛ¼Æ)[^¡££»]{0,120}?¸ßÓÚ\s*([0-9][0-9,.]*)\s*(?:ÈËÃñ±Ò)?Ôª[^¡££»]{0,100}?(?:Éê¹º|¶¨Í¶|¶¨ÆÚ¶¨¶î)/,
+    // â€œç´¯è®¡é«˜äº10å…ƒçš„ç”³è´­ä¸šåŠ¡è¿›è¡Œé™åˆ¶â€
+    /(?:å•ç¬”æˆ–å¤šç¬”ç´¯è®¡|ç´¯è®¡)[^ã€‚ï¼›]{0,120}?é«˜äº\s*([0-9][0-9,.]*)\s*(?:äººæ°‘å¸)?å…ƒ[^ã€‚ï¼›]{0,100}?(?:ç”³è´­|å®šæŠ•|å®šæœŸå®šé¢)/,
 
-    // ¡°µ¥ÈÕ...Éê¹ºÀÛ¼Æ½ğ¶îÏŞÖÆµ÷ÕûÎª10Ôª¡±
-    /µ¥ÈÕ[^¡££»]{0,180}?(?:Éê¹º|¶¨ÆÚ¶¨¶î)[^¡££»]{0,160}?(?:ÏŞÖÆµ÷ÕûÎª|µ÷ÕûÎª|²»³¬¹ı|²»µÃ³¬¹ı)\s*([0-9][0-9,.]*)\s*(?:ÈËÃñ±Ò)?Ôª/
+    // â€œå•æ—¥...ç”³è´­ç´¯è®¡é‡‘é¢é™åˆ¶è°ƒæ•´ä¸º10å…ƒâ€
+    /å•æ—¥[^ã€‚ï¼›]{0,180}?(?:ç”³è´­|å®šæœŸå®šé¢)[^ã€‚ï¼›]{0,160}?(?:é™åˆ¶è°ƒæ•´ä¸º|è°ƒæ•´ä¸º|ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡)\s*([0-9][0-9,.]*)\s*(?:äººæ°‘å¸)?å…ƒ/
   ];
 
   for(const p of patterns){
@@ -3757,13 +3756,13 @@ function extractChannelLimitV38(text,channel) {
   const s=normalizeNoticeText(text);
 
   const directPatterns=[
-    /(?:Ö±ÏúÇşµÀ|Ö±Ïú»ú¹¹|Ö±Ïúµç×Ó½»Ò×Æ½Ì¨|ÍøÉÏÖ±Ïú|»ù½ğ¹ÜÀíÈËÖ±Ïú|±¾¹«Ë¾Ö±Ïú)[^¡££»]{0,260}?(?:¸ßÓÚ|³¬¹ı|²»Ó¦³¬¹ı|²»³¬¹ı|²»µÃ³¬¹ı|ÉÏÏŞ(?:Îª|µ÷ÕûÎª)?|ÏŞÖÆ(?:Îª|µ÷ÕûÎª)?)\s*([0-9][0-9,.]*)\s*(?:ÈËÃñ±Ò)?Ôª/,
-    /Õë¶ÔÔÚ[^¡££»]{0,80}?Ö±ÏúÇşµÀ[^¡££»]{0,260}?(?:¸ßÓÚ|³¬¹ı)\s*([0-9][0-9,.]*)\s*(?:ÈËÃñ±Ò)?Ôª/
+    /(?:ç›´é”€æ¸ é“|ç›´é”€æœºæ„|ç›´é”€ç”µå­äº¤æ˜“å¹³å°|ç½‘ä¸Šç›´é”€|åŸºé‡‘ç®¡ç†äººç›´é”€|æœ¬å…¬å¸ç›´é”€)[^ã€‚ï¼›]{0,260}?(?:é«˜äº|è¶…è¿‡|ä¸åº”è¶…è¿‡|ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡|ä¸Šé™(?:ä¸º|è°ƒæ•´ä¸º)?|é™åˆ¶(?:ä¸º|è°ƒæ•´ä¸º)?)\s*([0-9][0-9,.]*)\s*(?:äººæ°‘å¸)?å…ƒ/,
+    /é’ˆå¯¹åœ¨[^ã€‚ï¼›]{0,80}?ç›´é”€æ¸ é“[^ã€‚ï¼›]{0,260}?(?:é«˜äº|è¶…è¿‡)\s*([0-9][0-9,.]*)\s*(?:äººæ°‘å¸)?å…ƒ/
   ];
 
   const agencyPatterns=[
-    /(?:´úÏú»ú¹¹|´úÏúÇşµÀ|¸÷´úÏú»ú¹¹|·ÇÖ±ÏúÏúÊÛ»ú¹¹|ÆäËûÏúÊÛ»ú¹¹)[^¡££»]{0,260}?(?:¸ßÓÚ|³¬¹ı|²»Ó¦³¬¹ı|²»³¬¹ı|²»µÃ³¬¹ı|ÉÏÏŞ(?:Îª|µ÷ÕûÎª)?|ÏŞÖÆ(?:Îª|µ÷ÕûÎª)?)\s*([0-9][0-9,.]*)\s*(?:ÈËÃñ±Ò)?Ôª/,
-    /(?:³ıÖ±Ïú[^¡££»]{0,60}?ÍâµÄÏúÊÛ»ú¹¹)[^¡££»]{0,260}?(?:¸ßÓÚ|³¬¹ı|²»³¬¹ı|²»µÃ³¬¹ı)\s*([0-9][0-9,.]*)\s*(?:ÈËÃñ±Ò)?Ôª/
+    /(?:ä»£é”€æœºæ„|ä»£é”€æ¸ é“|å„ä»£é”€æœºæ„|éç›´é”€é”€å”®æœºæ„|å…¶ä»–é”€å”®æœºæ„)[^ã€‚ï¼›]{0,260}?(?:é«˜äº|è¶…è¿‡|ä¸åº”è¶…è¿‡|ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡|ä¸Šé™(?:ä¸º|è°ƒæ•´ä¸º)?|é™åˆ¶(?:ä¸º|è°ƒæ•´ä¸º)?)\s*([0-9][0-9,.]*)\s*(?:äººæ°‘å¸)?å…ƒ/,
+    /(?:é™¤ç›´é”€[^ã€‚ï¼›]{0,60}?å¤–çš„é”€å”®æœºæ„)[^ã€‚ï¼›]{0,260}?(?:é«˜äº|è¶…è¿‡|ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡)\s*([0-9][0-9,.]*)\s*(?:äººæ°‘å¸)?å…ƒ/
   ];
 
   const patterns=channel==="direct"
@@ -3785,21 +3784,21 @@ function explicitChannelStateV38(text,channel) {
 
   if(channel==="direct"){
     if(
-      /(?:Ö±Ïúµç×Ó½»Ò×Æ½Ì¨|Ö±ÏúÇşµÀ|Ö±Ïú»ú¹¹|ÍøÉÏÖ±Ïú)[^¡££»]{0,180}?ÔİÍ£[^¡££»]{0,120}?Éê¹º/.test(s) ||
-      /ÔÚ»ù½ğ¹ÜÀíÈËÖ±Ïúµç×Ó½»Ò×Æ½Ì¨ÔİÍ£[^¡££»]{0,180}?Éê¹ºÒµÎñ/.test(s)
+      /(?:ç›´é”€ç”µå­äº¤æ˜“å¹³å°|ç›´é”€æ¸ é“|ç›´é”€æœºæ„|ç½‘ä¸Šç›´é”€)[^ã€‚ï¼›]{0,180}?æš‚åœ[^ã€‚ï¼›]{0,120}?ç”³è´­/.test(s) ||
+      /åœ¨åŸºé‡‘ç®¡ç†äººç›´é”€ç”µå­äº¤æ˜“å¹³å°æš‚åœ[^ã€‚ï¼›]{0,180}?ç”³è´­ä¸šåŠ¡/.test(s)
     ) return "suspended";
 
     if(
-      /(?:Ö±Ïúµç×Ó½»Ò×Æ½Ì¨|Ö±ÏúÇşµÀ|Ö±Ïú»ú¹¹|ÍøÉÏÖ±Ïú)[^¡££»]{0,180}?»Ö¸´[^¡££»]{0,120}?Éê¹º/.test(s)
+      /(?:ç›´é”€ç”µå­äº¤æ˜“å¹³å°|ç›´é”€æ¸ é“|ç›´é”€æœºæ„|ç½‘ä¸Šç›´é”€)[^ã€‚ï¼›]{0,180}?æ¢å¤[^ã€‚ï¼›]{0,120}?ç”³è´­/.test(s)
     ) return "open";
   }else{
     if(
-      /(?:´úÏú»ú¹¹|´úÏúÇşµÀ|¸÷ÏúÊÛ»ú¹¹|±¾¹«Ë¾Ö±Ïú¹ñÌ¨¼°´úÏú»ú¹¹)[^¡££»]{0,220}?(?:ÈÔ)?ÔİÍ£[^¡££»]{0,120}?Éê¹º/.test(s) ||
-      /´úÏú»ú¹¹ÈÔÔİÍ£°ìÀíÉê¹º/.test(s)
+      /(?:ä»£é”€æœºæ„|ä»£é”€æ¸ é“|å„é”€å”®æœºæ„|æœ¬å…¬å¸ç›´é”€æŸœå°åŠä»£é”€æœºæ„)[^ã€‚ï¼›]{0,220}?(?:ä»)?æš‚åœ[^ã€‚ï¼›]{0,120}?ç”³è´­/.test(s) ||
+      /ä»£é”€æœºæ„ä»æš‚åœåŠç†ç”³è´­/.test(s)
     ) return "suspended";
 
     if(
-      /(?:´úÏú»ú¹¹|´úÏúÇşµÀ|¸÷ÏúÊÛ»ú¹¹)[^¡££»]{0,180}?»Ö¸´[^¡££»]{0,120}?Éê¹º/.test(s)
+      /(?:ä»£é”€æœºæ„|ä»£é”€æ¸ é“|å„é”€å”®æœºæ„)[^ã€‚ï¼›]{0,180}?æ¢å¤[^ã€‚ï¼›]{0,120}?ç”³è´­/.test(s)
     ) return "open";
   }
   return null;
@@ -3809,10 +3808,10 @@ function extractDirectAffectedCodesV38(text,product){
   const s=normalizeNoticeText(text);
   const segs=[];
 
-  for(const m of s.matchAll(/[^¡££»]{0,80}Ö±ÏúÇşµÀ[^¡££»]{0,320}/g)){
+  for(const m of s.matchAll(/[^ã€‚ï¼›]{0,80}ç›´é”€æ¸ é“[^ã€‚ï¼›]{0,320}/g)){
     segs.push(m[0]);
   }
-  for(const m of s.matchAll(/[^¡££»]{0,80}Ö±Ïúµç×Ó½»Ò×Æ½Ì¨[^¡££»]{0,320}/g)){
+  for(const m of s.matchAll(/[^ã€‚ï¼›]{0,80}ç›´é”€ç”µå­äº¤æ˜“å¹³å°[^ã€‚ï¼›]{0,320}/g)){
     segs.push(m[0]);
   }
 
@@ -3883,8 +3882,8 @@ function parseNoticeStateV38(notice,text,product) {
       product
     );
 
-  // ¡°ÔÚÖ±ÏúÆ½Ì¨ÔİÍ£...Éê¹ºÒµÎñ¡±ÕâÖÖ±êÌâ£¬Ô­ parser ¿ÉÄÜÖ»Ê¶±ğ scope£¬
-  // ÕâÀïÃ÷È·²¹³É direct suspended¡£
+  // â€œåœ¨ç›´é”€å¹³å°æš‚åœ...ç”³è´­ä¸šåŠ¡â€è¿™ç§æ ‡é¢˜ï¼ŒåŸ parser å¯èƒ½åªè¯†åˆ« scopeï¼Œ
+  // è¿™é‡Œæ˜ç¡®è¡¥æˆ direct suspendedã€‚
   if(
     parsed.scope==="direct" &&
     parsed.directStateExplicit==="suspended" &&
@@ -3956,8 +3955,8 @@ function comparableChannelV38(
       ?parsed.directStateExplicit
       :parsed.agencyStateExplicit;
 
-  // ¼´Ê¹±êÌâÊÇ direct-only£¬Èç¹ûÕıÎÄÃ÷È·Ğ´ÁË´úÏú¡°ÈÔÔİÍ£¡±£¬
-  // Ò²ÔÊĞí°Ñ agency ×´Ì¬×÷Îª¶ÀÁ¢Ö¤¾İ¡£
+  // å³ä½¿æ ‡é¢˜æ˜¯ direct-onlyï¼Œå¦‚æœæ­£æ–‡æ˜ç¡®å†™äº†ä»£é”€â€œä»æš‚åœâ€ï¼Œ
+  // ä¹Ÿå…è®¸æŠŠ agency çŠ¶æ€ä½œä¸ºç‹¬ç«‹è¯æ®ã€‚
   if(
     scope!=="general" &&
     scope!==channel &&
@@ -4042,15 +4041,15 @@ function parseNoticeStateV37(notice,text,product) {
 }
 
 function shareIsAffectedV37(parsed,meta,product) {
-  // ±êÌâÀïÃ÷È·Ğ´ ¡°AÀà¼°CÀà¡± Ê±£¬ÕâÊÇ×îÇ¿×÷ÓÃ·¶Î§£¬
-  // ²»ÄÜÒòÎªÕıÎÄ»ù´¡ĞÅÏ¢ÀïË³´ø³öÏÖ F/I ´úÂë¾Í°Ñ F/I Ò²Ëã½øÈ¥¡£
+  // æ ‡é¢˜é‡Œæ˜ç¡®å†™ â€œAç±»åŠCç±»â€ æ—¶ï¼Œè¿™æ˜¯æœ€å¼ºä½œç”¨èŒƒå›´ï¼Œ
+  // ä¸èƒ½å› ä¸ºæ­£æ–‡åŸºç¡€ä¿¡æ¯é‡Œé¡ºå¸¦å‡ºç° F/I ä»£ç å°±æŠŠ F/I ä¹Ÿç®—è¿›å»ã€‚
   if (parsed?.titleAffectedClasses?.length) {
-    if (meta.share==="µ¥Ò»") return true;
+    if (meta.share==="å•ä¸€") return true;
     return parsed.titleAffectedClasses.includes(meta.share);
   }
 
   if (parsed?.affectedClasses?.length) {
-    if (meta.share==="µ¥Ò»") return true;
+    if (meta.share==="å•ä¸€") return true;
     return parsed.affectedClasses.includes(meta.share);
   }
 
@@ -4078,7 +4077,7 @@ async function loadAnnouncementBundle() {
     }
   }
 
-  // ÏÈ¶ÁĞÂ°æ»º´æ¡£
+  // å…ˆè¯»æ–°ç‰ˆç¼“å­˜ã€‚
   const primary=await readOne(
     OTC_ANN_BUNDLE_CACHE_URL
   );
@@ -4092,8 +4091,8 @@ async function loadAnnouncementBundle() {
     };
   }
 
-  // v3.12 µÄÎÊÌâ¾ÍÊÇÇ¿ÖÆ»»»º´æµ¼ÖÂÀäÆô¶¯ÒªÖØ×¥´óÁ¿ÕıÎÄ¡£
-  // Èç¹ûĞÂ°æ»º´æ»¹Ã»½¨Á¢£¬Ö±½Ó¼Ì³Ğ v3.10/v3.11 ÒÑ¾­ÎÈ¶¨µÄ v6 Êı¾İ¡£
+  // v3.12 çš„é—®é¢˜å°±æ˜¯å¼ºåˆ¶æ¢ç¼“å­˜å¯¼è‡´å†·å¯åŠ¨è¦é‡æŠ“å¤§é‡æ­£æ–‡ã€‚
+  // å¦‚æœæ–°ç‰ˆç¼“å­˜è¿˜æ²¡å»ºç«‹ï¼Œç›´æ¥ç»§æ‰¿ v3.10/v3.11 å·²ç»ç¨³å®šçš„ v6 æ•°æ®ã€‚
   const fallback=await readOne(
     OTC_ANN_BUNDLE_FALLBACK_CACHE_URL
   );
@@ -4260,10 +4259,10 @@ async function fillAnnouncementBundle({
     currentLatest
   );
 
-  // ÀäÆô¶¯²»ÔÙ´®ĞĞ×¥ 21 ÆªÕıÎÄ¡£
-  // ×î¶à16Æª¡¢²¢·¢5Â·£º
-  // 1°²öÎÀÖ + 25ÁĞ±í + 16ÕıÎÄ = 42£¬
-  // ÈÔ¸øÀúÊ·»ØËİÔ¤ÁôÔ¼6´ÎÍâ²¿ÇëÇó¡£
+  // å†·å¯åŠ¨ä¸å†ä¸²è¡ŒæŠ“ 21 ç¯‡æ­£æ–‡ã€‚
+  // æœ€å¤š16ç¯‡ã€å¹¶å‘5è·¯ï¼š
+  // 1å®‰é‘«ä¹ + 25åˆ—è¡¨ + 16æ­£æ–‡ = 42ï¼Œ
+  // ä»ç»™å†å²å›æº¯é¢„ç•™çº¦6æ¬¡å¤–éƒ¨è¯·æ±‚ã€‚
   const MAX_BODY_FETCH=16;
 
   const priority=[
@@ -4490,19 +4489,19 @@ function candidateIdsForRow(
   );
   if (sourceId) ids.push(sourceId);
 
-  // Ö÷´úÂë×îĞÂ¹«¸æ
+  // ä¸»ä»£ç æœ€æ–°å…¬å‘Š
   const mainLatest=currentLatest?.[
     product.mainCode
   ]?.id;
   if (mainLatest) ids.push(mainLatest);
 
-  // ÌØÊâ D/E/F/I ·İ¶î×Ô¼ºµÄ×îĞÂ¹«¸æ
+  // ç‰¹æ®Š D/E/F/I ä»½é¢è‡ªå·±çš„æœ€æ–°å…¬å‘Š
   const ownLatest=currentLatest?.[
     row.code
   ]?.id;
   if (ownLatest) ids.push(ownLatest);
 
-  // »º´æÖĞÍ¬Ò»²úÆ·¡¢Í¬Ò»ÌØÊâ´úÂëÀúÊ·ÉÏÒÑ½âÎöµÄ¹«¸æÒ²×÷ÎªºòÑ¡¡£
+  // ç¼“å­˜ä¸­åŒä¸€äº§å“ã€åŒä¸€ç‰¹æ®Šä»£ç å†å²ä¸Šå·²è§£æçš„å…¬å‘Šä¹Ÿä½œä¸ºå€™é€‰ã€‚
   for (const [id,item] of Object.entries(bundle.byId||{})) {
     const sourceCodes=item?.sourceCodes||[];
     const mainCodes=item?.mainCodes||[];
@@ -4564,7 +4563,7 @@ function compareAnnouncementToAnxinV37(
   if (!official?.parsed) {
     return {
       status:"unverified",
-      label:"¹Ù·½¹«¸æ´ı½âÎö",
+      label:"å®˜æ–¹å…¬å‘Šå¾…è§£æ",
       checks:[]
     };
   }
@@ -4578,7 +4577,7 @@ function compareAnnouncementToAnxinV37(
   )) {
     return {
       status:"not_affected",
-      label:"¹«¸æÎ´Éæ¼°¸Ã·İ¶î",
+      label:"å…¬å‘Šæœªæ¶‰åŠè¯¥ä»½é¢",
       checks:[]
     };
   }
@@ -4591,7 +4590,7 @@ function compareAnnouncementToAnxinV37(
   if (timing==="upcoming") {
     return {
       status:"upcoming",
-      label:`${parsed.effectiveDate||"Î´À´ÈÕÆÚ"}ÆğÉúĞ§`,
+      label:`${parsed.effectiveDate||"æœªæ¥æ—¥æœŸ"}èµ·ç”Ÿæ•ˆ`,
       checks:[]
     };
   }
@@ -4599,7 +4598,7 @@ function compareAnnouncementToAnxinV37(
   if (timing!=="active") {
     return {
       status:"unverified",
-      label:"¹«¸æµ±Ç°Î´ÉúĞ§",
+      label:"å…¬å‘Šå½“å‰æœªç”Ÿæ•ˆ",
       checks:[]
     };
   }
@@ -4628,7 +4627,7 @@ function compareAnnouncementToAnxinV37(
     ) {
       return {
         status:"partial",
-        label:"×´Ì¬Ò»ÖÂ¡¤½ğ¶îÎ´¶ÀÁ¢½âÎö",
+        label:"çŠ¶æ€ä¸€è‡´Â·é‡‘é¢æœªç‹¬ç«‹è§£æ",
         checks:[]
       };
     }
@@ -4639,14 +4638,14 @@ function compareAnnouncementToAnxinV37(
     ) {
       return {
         status:"match",
-        label:"¹«¸æÒ»ÖÂ",
+        label:"å…¬å‘Šä¸€è‡´",
         checks:[]
       };
     }
 
     return {
       status:"partial",
-      label:"¹«¸æÒÑ¶ÁÈ¡¡¤¿É±È×Ö¶Î²»×ã",
+      label:"å…¬å‘Šå·²è¯»å–Â·å¯æ¯”å­—æ®µä¸è¶³",
       checks:[]
     };
   }
@@ -4658,13 +4657,13 @@ function compareAnnouncementToAnxinV37(
   return mismatches.length
     ?{
       status:"mismatch",
-      label:"Óë¹«¸æ²»Ò»ÖÂ",
+      label:"ä¸å…¬å‘Šä¸ä¸€è‡´",
       checks,
       mismatches
     }
     :{
       status:"match",
-      label:"¹«¸æÒ»ÖÂ",
+      label:"å…¬å‘Šä¸€è‡´",
       checks
     };
 }
@@ -4689,8 +4688,8 @@ function verifyAnxinRowsV37({
       x=>x.timing==="upcoming"
     )||null;
 
-    // µ±Ç°ÉúĞ§¹«¸æÈ¡¡°×îĞÂÇÒÊÊÓÃÓÚ¸Ã·İ¶î¡±µÄ active ¹«¸æ¡£
-    // ÕâÄÜ¸²¸Ç I/F ¶ÀÁ¢·İ¶î¹«¸æ£¬²»ÔÙÇ¿ĞĞÊ¹ÓÃÖ÷´úÂë¾É¹«¸æ¡£
+    // å½“å‰ç”Ÿæ•ˆå…¬å‘Šå–â€œæœ€æ–°ä¸”é€‚ç”¨äºè¯¥ä»½é¢â€çš„ active å…¬å‘Šã€‚
+    // è¿™èƒ½è¦†ç›– I/F ç‹¬ç«‹ä»½é¢å…¬å‘Šï¼Œä¸å†å¼ºè¡Œä½¿ç”¨ä¸»ä»£ç æ—§å…¬å‘Šã€‚
     const active=candidates.find(
       x=>x.timing==="active"
     )||null;
@@ -4726,12 +4725,12 @@ function verifyAnxinRowsV37({
         latestCandidate.id
       );
 
-    // ÈôÓĞÎ´À´¹«¸æ£¬ÑéÖ¤×´Ì¬ÏÔÊ¾ÌáÇ°Ô¤¾¯£¬µ«±£Áô currentVerificationStatus¡£
+    // è‹¥æœ‰æœªæ¥å…¬å‘Šï¼ŒéªŒè¯çŠ¶æ€æ˜¾ç¤ºæå‰é¢„è­¦ï¼Œä½†ä¿ç•™ currentVerificationStatusã€‚
     const displayStatus=upcoming
       ?"upcoming"
       :verification.status;
     const displayLabel=upcoming
-      ?`${upcoming.parsed.effectiveDate||"Î´À´ÈÕÆÚ"}ÆğÉúĞ§`
+      ?`${upcoming.parsed.effectiveDate||"æœªæ¥æ—¥æœŸ"}èµ·ç”Ÿæ•ˆ`
       :verification.label;
 
     return {
@@ -4927,10 +4926,10 @@ async function backfillUnverifiedAnnouncements({
     verifiedRows
   );
 
-  // ÕâÀïÖ»´¦ÀíÕı³£25´úÂë¼ì²éºóÈÔÎª unverified / partial µÄ²úÆ·¡£
-  // Íâ²¿ fetch Ô¤Ëã°´ 48 ´Î¿ØÖÆ£º
-  // 1 °²öÎÀÖ + 25 Ê×ÆÁ¹«¸æÁĞ±í + Ê×ÂÖÕıÎÄ + ÀúÊ·»ØËİ <= 48¡£
-  // Cache API ²»¼ÆÈëÕâ¸ö¶¯Ì¬ fetch Ô¤Ëã¡£
+  // è¿™é‡Œåªå¤„ç†æ­£å¸¸25ä»£ç æ£€æŸ¥åä»ä¸º unverified / partial çš„äº§å“ã€‚
+  // å¤–éƒ¨ fetch é¢„ç®—æŒ‰ 48 æ¬¡æ§åˆ¶ï¼š
+  // 1 å®‰é‘«ä¹ + 25 é¦–å±å…¬å‘Šåˆ—è¡¨ + é¦–è½®æ­£æ–‡ + å†å²å›æº¯ <= 48ã€‚
+  // Cache API ä¸è®¡å…¥è¿™ä¸ªåŠ¨æ€ fetch é¢„ç®—ã€‚
   const baseFetches=
     1 +
     OTC_ANN_WATCH_CODES.length +
@@ -4958,9 +4957,9 @@ async function backfillUnverifiedAnnouncements({
 
     productsChecked.push(mainCode);
 
-    // ÏÈÖØĞÂ¶ÁÈ¡µÚ1Ò³¡£Ô­Òò£º
-    // ĞÂ°æ¿ÉÄÜ¸Õ¸ÕÅÅ³ıÁË¡°Éê¹º/¶¨Í¶Æğµã¡±µÈÎ±¶î¶È¹«¸æ£¬
-    // ÕæÕıÓĞĞ§µÄÔİÍ£/ÏŞ¶î¹«¸æ¿ÉÄÜ±¾À´¾ÍÔÚµÚ1Ò³½ÏºóÎ»ÖÃ¡£
+    // å…ˆé‡æ–°è¯»å–ç¬¬1é¡µã€‚åŸå› ï¼š
+    // æ–°ç‰ˆå¯èƒ½åˆšåˆšæ’é™¤äº†â€œç”³è´­/å®šæŠ•èµ·ç‚¹â€ç­‰ä¼ªé¢åº¦å…¬å‘Šï¼Œ
+    // çœŸæ­£æœ‰æ•ˆçš„æš‚åœ/é™é¢å…¬å‘Šå¯èƒ½æœ¬æ¥å°±åœ¨ç¬¬1é¡µè¾ƒåä½ç½®ã€‚
     if(budget.remaining>=1){
       budget.remaining-=1;
       pagesChecked+=1;
@@ -5047,7 +5046,7 @@ async function backfillUnverifiedAnnouncements({
       }
     }
 
-    // µÚ1Ò³ÈÔÎ´½â¾öÊ±£¬×î¶à¼ÌĞø¿´µÚ2~4Ò³¡£
+    // ç¬¬1é¡µä»æœªè§£å†³æ—¶ï¼Œæœ€å¤šç»§ç»­çœ‹ç¬¬2~4é¡µã€‚
     for(let page=2;page<=4;page++){
       if(budget.remaining<1)break;
 
@@ -5182,69 +5181,25 @@ async function buildOtcFundsHybridV37({
   const today=shanghaiNowParts().date;
 
   if (!forceRefresh) {
-    const short=await loadTimedJsonCache(
+    const daily=await loadTimedJsonCache(
       OTC_RESULT_CACHE_URL,
-      OTC_RESULT_FRESH_MS
+      36*3600*1000
     );
     if (
-      short &&
-      short.engineVersion===
-        OTC_ENGINE_VERSION
+      daily &&
+      daily.engineVersion===OTC_ENGINE_VERSION &&
+      daily.checkDate===today
     ) {
       return {
-        ...short,
-        servedFromWorkerCache:true
-      };
-    }
-
-    // ÆÕÍ¨´ò¿ªÍøÒ³Ê±£¬¹ıÆÚ»º´æÒ²ÏÈ¿ìËÙ·µ»Ø£¬±ÜÃâµÈ´ı25¸ö¹«¸æÁĞ±í
-    // ÒÔ¼°¹«¸æÕıÎÄÈ«²¿¶ÁÈ¡Íê³É¡£×îĞÂÊı¾İÓÉ waitUntil ÔÚºóÌ¨¸üĞÂ¡£
-    const lastGood=
-      await loadOtcLastGood();
-
-    if(
-      lastGood &&
-      Array.isArray(lastGood.rows) &&
-      lastGood.rows.length
-    ){
-      const canRefreshInBackground=
-        !!ctx &&
-        typeof ctx.waitUntil===
-          "function";
-
-      if(canRefreshInBackground){
-        ctx.waitUntil(
-          buildOtcFundsHybridV37({
-            forceRefresh:true,
-            ctx:null
-          }).catch(e=>{
-            console.error(
-              "background OTC refresh failed",
-              e
-            );
-          })
-        );
-      }
-
-      return {
-        ...lastGood,
-        servedAt:
-          new Date().toISOString(),
-        servedFromLastGood:true,
-        refreshingInBackground:
-          canRefreshInBackground,
-        rows:(lastGood.rows||[]).map(
-          r=>({
-            ...r,
-            dataStatus:"cached"
-          })
-        )
+        ...daily,
+        servedFromWorkerCache:true,
+        servedFromDailyCache:true
       };
     }
   }
 
   try {
-    // 1) µ±Ç°¶î¶ÈÖ÷Ô´
+    // 1) å½“å‰é¢åº¦ä¸»æº
     const anxinHtml=await fetchText(
       ANXINLE_OTC_SOURCE_URL,
       10000
@@ -5253,14 +5208,14 @@ async function buildOtcFundsHybridV37({
       anxinHtml
     );
 
-    // 2) Ò»´Î consolidated cache read
+    // 2) ä¸€æ¬¡ consolidated cache read
     const bundle=await loadAnnouncementBundle();
 
-    // 3) 17Ö÷´úÂë + 8ÌØÊâ·İ¶î = 25 ¸ö¹«¸æÁĞ±í
+    // 3) 17ä¸»ä»£ç  + 8ç‰¹æ®Šä»½é¢ = 25 ä¸ªå…¬å‘Šåˆ—è¡¨
     const watchResults=
       await fetchAnnouncementWatchLists();
 
-    // 4) ×î¶à¶ÁÈ¡21Æª¡°ĞÂÔö/µ±Ç°ÑéÖ¤¡±ÕıÎÄ
+    // 4) æœ€å¤šè¯»å–21ç¯‡â€œæ–°å¢/å½“å‰éªŒè¯â€æ­£æ–‡
     const filled=await fillAnnouncementBundle({
       bundle,
       watchResults,
@@ -5268,8 +5223,8 @@ async function buildOtcFundsHybridV37({
       today
     });
 
-    // Ö»ÖØ½âÎö¼«ÉÙÁ¿¾É¡°ÀúÊ·»ØËİ¹«¸æ¡±£¬ÓÃÓÚĞŞÕıÀàËÆ
-    // ¡°2025Äê9ÔÂ29ÈÕÆğ¡±±»¾É»º´æ¼Ç³É¹«¸æ·¢²¼ÈÕÆÚµÄÎÊÌâ¡£
+    // åªé‡è§£ææå°‘é‡æ—§â€œå†å²å›æº¯å…¬å‘Šâ€ï¼Œç”¨äºä¿®æ­£ç±»ä¼¼
+    // â€œ2025å¹´9æœˆ29æ—¥èµ·â€è¢«æ—§ç¼“å­˜è®°æˆå…¬å‘Šå‘å¸ƒæ—¥æœŸçš„é—®é¢˜ã€‚
     const legacyRefresh=
       await refreshLegacyEffectiveDates({
         bundle:filled.bundle,
@@ -5277,7 +5232,7 @@ async function buildOtcFundsHybridV37({
         maxFetch:2
       });
 
-    // 5) ¹Ù·½¹«¸æĞ£Ñé£»µ±Ç°¶î¶È¾ø²»±»¹«¸æ¸²¸Ç
+    // 5) å®˜æ–¹å…¬å‘Šæ ¡éªŒï¼›å½“å‰é¢åº¦ç»ä¸è¢«å…¬å‘Šè¦†ç›–
     let rows=verifyAnxinRowsV37({
       rows:anxin.rows,
       bundle:filled.bundle,
@@ -5286,8 +5241,8 @@ async function buildOtcFundsHybridV37({
       today
     });
 
-    // 6) ½ö¶ÔÈÔÎ´ÑéÖ¤µÄ²úÆ·Ïòºó·­ÀúÊ·¹«¸æ¡£
-    // ÀıÈç½ÏÔç·¢²¼ÇÒ¡°»Ö¸´Ê±¼äÁíĞĞ¹«¸æ¡±µÄ³ÖĞøÔİÍ£¹«¸æ¡£
+    // 6) ä»…å¯¹ä»æœªéªŒè¯çš„äº§å“å‘åç¿»å†å²å…¬å‘Šã€‚
+    // ä¾‹å¦‚è¾ƒæ—©å‘å¸ƒä¸”â€œæ¢å¤æ—¶é—´å¦è¡Œå…¬å‘Šâ€çš„æŒç»­æš‚åœå…¬å‘Šã€‚
     const historyBackfill=
       await backfillUnverifiedAnnouncements({
         baseRows:anxin.rows,
@@ -5363,12 +5318,12 @@ async function buildOtcFundsHybridV37({
       matched:anxin.matched,
       total:OTC_CNY_META.length,
 
-      source:"°²öÎÀÖQDII¶î¶ÈÈÕ±¨",
+      source:"å®‰é‘«ä¹QDIIé¢åº¦æ—¥æŠ¥",
       sourceUrl:ANXINLE_OTC_SOURCE_URL,
       verificationSource:
-        "»ù½ğ¹ÜÀíÈË¹«¸æÔ­ÎÄ",
+        "åŸºé‡‘ç®¡ç†äººå…¬å‘ŠåŸæ–‡",
       verificationTransport:
-        "¶«·½²Æ¸»/ÌìÌì»ù½ğ¹«¸æ½Ó¿Ú",
+        "ä¸œæ–¹è´¢å¯Œ/å¤©å¤©åŸºé‡‘å…¬å‘Šæ¥å£",
 
       announcementListChecks:
         OTC_ANN_WATCH_CODES.length,
@@ -5418,7 +5373,7 @@ async function buildOtcFundsHybridV37({
         ...result,
         cachedAt:new Date().toISOString()
       },
-      300
+      36*3600
     );
 
     return result;
@@ -5463,15 +5418,15 @@ async function buildOtcFundsHybrid({
   }
 
   try {
-    // Ö÷Êı¾İÔ´£ºÃ¿´ÎÇ¿ÖÆË¢ĞÂ¶¼»áÖØĞÂ¶ÁÈ¡°²öÎÀÖ×îĞÂÈÕ±¨¡£
+    // ä¸»æ•°æ®æºï¼šæ¯æ¬¡å¼ºåˆ¶åˆ·æ–°éƒ½ä¼šé‡æ–°è¯»å–å®‰é‘«ä¹æœ€æ–°æ—¥æŠ¥ã€‚
     const anxinHtml=await fetchText(
       ANXINLE_OTC_SOURCE_URL,
       10000
     );
     const anxin=parseAnxinRows(anxinHtml);
 
-    // Ğ£ÑéÔ´£ºÃ¿¸ö»ù½ğ²úÆ·Ã¿´Î´ò¿ªÒ³Ãæ¶¼¼ì²éÒ»´Î¹«¸æÁĞ±í¡£
-    // ¹«¸æ ID Î´±ä»¯Ê±¸´ÓÃÕıÎÄ½âÎö»º´æ£»ÓĞĞÂ¹«¸æ²ÅÖØĞÂ¶ÁÕıÎÄ¡£
+    // æ ¡éªŒæºï¼šæ¯ä¸ªåŸºé‡‘äº§å“æ¯æ¬¡æ‰“å¼€é¡µé¢éƒ½æ£€æŸ¥ä¸€æ¬¡å…¬å‘Šåˆ—è¡¨ã€‚
+    // å…¬å‘Š ID æœªå˜åŒ–æ—¶å¤ç”¨æ­£æ–‡è§£æç¼“å­˜ï¼›æœ‰æ–°å…¬å‘Šæ‰é‡æ–°è¯»æ­£æ–‡ã€‚
     const announcements=await mapLimit(
       OTC_PRODUCTS,
       5,
@@ -5536,11 +5491,11 @@ async function buildOtcFundsHybrid({
       quotaDate:anxin.quotaDate,
       matched:anxin.matched,
       total:OTC_CNY_META.length,
-      source:"°²öÎÀÖQDII¶î¶ÈÈÕ±¨",
+      source:"å®‰é‘«ä¹QDIIé¢åº¦æ—¥æŠ¥",
       sourceUrl:ANXINLE_OTC_SOURCE_URL,
-      verificationSource:"»ù½ğ¹ÜÀíÈË¹«¸æÔ­ÎÄ",
+      verificationSource:"åŸºé‡‘ç®¡ç†äººå…¬å‘ŠåŸæ–‡",
       verificationTransport:
-        "¶«·½²Æ¸»/ÌìÌì»ù½ğ¹«¸æ½Ó¿Ú",
+        "ä¸œæ–¹è´¢å¯Œ/å¤©å¤©åŸºé‡‘å…¬å‘Šæ¥å£",
       rows,
       productAnnouncements,
       announcementListChecks:OTC_PRODUCTS.length,
@@ -5634,7 +5589,7 @@ async function buildOtcFunds() {
   }
 
   try {
-    // 17 ¸ö²úÆ·ÏÈ¹«Æ½µØ¸÷È¡Ò»´Î¹«¸æÁĞ±í¡£
+    // 17 ä¸ªäº§å“å…ˆå…¬å¹³åœ°å„å–ä¸€æ¬¡å…¬å‘Šåˆ—è¡¨ã€‚
     const listItems=await mapLimit(
       OTC_PRODUCTS,
       5,
@@ -5668,10 +5623,10 @@ async function buildOtcFunds() {
     }
 
     // Cloudflare Free: 50 subrequests/request.
-    // 17´Î¹«¸æÁĞ±í + ×î¶à31´Î¹«¸æÕıÎÄ = 48£¬Áô2´ÎÓàÁ¿¡£
+    // 17æ¬¡å…¬å‘Šåˆ—è¡¨ + æœ€å¤š31æ¬¡å…¬å‘Šæ­£æ–‡ = 48ï¼Œç•™2æ¬¡ä½™é‡ã€‚
     const budget={remaining:31};
 
-    // µÚÒ»ÂÖ£ºËùÓĞÃ»ÓĞÃüÖĞ²úÆ·»º´æµÄ»ù½ğ£¬ÖÁÉÙ¸÷¶ÁÒ»ÆªÕıÎÄ¡£
+    // ç¬¬ä¸€è½®ï¼šæ‰€æœ‰æ²¡æœ‰å‘½ä¸­äº§å“ç¼“å­˜çš„åŸºé‡‘ï¼Œè‡³å°‘å„è¯»ä¸€ç¯‡æ­£æ–‡ã€‚
     for (const item of prepared) {
       if (item.cached || !item.resolution.notices.length) continue;
       await parseNextUsefulNotice(
@@ -5681,7 +5636,7 @@ async function buildOtcFunds() {
       );
     }
 
-    // µÚ¶şÂÖ£ºÔÙ¹«Æ½µØ¸ø¡°ÉĞÎ´ÍêÕûÈ·¶¨ÇşµÀ×´Ì¬¡±µÄ²úÆ·¸÷²¹Ò»Æª¡£
+    // ç¬¬äºŒè½®ï¼šå†å…¬å¹³åœ°ç»™â€œå°šæœªå®Œæ•´ç¡®å®šæ¸ é“çŠ¶æ€â€çš„äº§å“å„è¡¥ä¸€ç¯‡ã€‚
     for (const item of prepared) {
       if (budget.remaining<=0) break;
       if (item.cached) continue;
@@ -5694,7 +5649,7 @@ async function buildOtcFunds() {
       );
     }
 
-    // µÚÈıÂÖ£ºÈÔÓĞÓàÁ¿Ê±£¬ÓÅÏÈ¸øÍêÈ«Ã»ÓĞ½âÎö³öÈÎºÎ×´Ì¬µÄ²úÆ·¼ÌĞø²¹¡£
+    // ç¬¬ä¸‰è½®ï¼šä»æœ‰ä½™é‡æ—¶ï¼Œä¼˜å…ˆç»™å®Œå…¨æ²¡æœ‰è§£æå‡ºä»»ä½•çŠ¶æ€çš„äº§å“ç»§ç»­è¡¥ã€‚
     for (const item of prepared) {
       if (budget.remaining<=0) break;
       if (item.cached) continue;
@@ -5707,8 +5662,8 @@ async function buildOtcFunds() {
       );
     }
 
-    // Èç¹ûĞÂ½âÎöÖ»½â¾öÁËÒ»²¿·ÖÇşµÀ£¬¿É´Ó¸Ã²úÆ·¾É°æ¡°¹Ù·½¹«¸æ»º´æ¡±
-    // ²¹Î´ÖªÇşµÀ£»¾ø²»´ÓµÚÈı·½¶î¶ÈÔ´²¹¡£
+    // å¦‚æœæ–°è§£æåªè§£å†³äº†ä¸€éƒ¨åˆ†æ¸ é“ï¼Œå¯ä»è¯¥äº§å“æ—§ç‰ˆâ€œå®˜æ–¹å…¬å‘Šç¼“å­˜â€
+    // è¡¥æœªçŸ¥æ¸ é“ï¼›ç»ä¸ä»ç¬¬ä¸‰æ–¹é¢åº¦æºè¡¥ã€‚
     for (const item of prepared) {
       if (item.cached) continue;
 
@@ -5778,8 +5733,8 @@ async function buildOtcFunds() {
       matched:rows.filter(r=>r.status!=="missing").length,
       total:OTC_CNY_META.length,
       announcementContentFetches:31-budget.remaining,
-      source:"»ù½ğ¹ÜÀíÈË¹«¸æ",
-      transport:"¶«·½²Æ¸»/ÌìÌì»ù½ğ¹«¸æ½Ó¿Ú",
+      source:"åŸºé‡‘ç®¡ç†äººå…¬å‘Š",
+      transport:"ä¸œæ–¹è´¢å¯Œ/å¤©å¤©åŸºé‡‘å…¬å‘Šæ¥å£",
       sourceUrl:"https://fund.eastmoney.com/gonggao/",
       rows,
       summary:{
@@ -5855,23 +5810,23 @@ async function getOtcFeeDetails(code) {
   const html = await fetchText(sourceUrl,10000);
   const flat = stripHtml(html);
 
-  const management = numberOf((flat.match(/¹ÜÀí·ÑÂÊ\s*([0-9.]+)%/)||[])[1]);
-  const custody = numberOf((flat.match(/ÍĞ¹Ü·ÑÂÊ\s*([0-9.]+)%/)||[])[1]);
-  const service = numberOf((flat.match(/ÏúÊÛ·şÎñ·ÑÂÊ\s*([0-9.]+)%/)||[])[1]);
-  const currentPurchase = numberOf((flat.match(/¹ºÂòÊÖĞø·Ñ[:£º]?\s*([0-9.]+)%/)||[])[1]);
+  const management = numberOf((flat.match(/ç®¡ç†è´¹ç‡\s*([0-9.]+)%/)||[])[1]);
+  const custody = numberOf((flat.match(/æ‰˜ç®¡è´¹ç‡\s*([0-9.]+)%/)||[])[1]);
+  const service = numberOf((flat.match(/é”€å”®æœåŠ¡è´¹ç‡\s*([0-9.]+)%/)||[])[1]);
+  const currentPurchase = numberOf((flat.match(/è´­ä¹°æ‰‹ç»­è´¹[:ï¼š]?\s*([0-9.]+)%/)||[])[1]);
   const dailyLimitMatch =
-    flat.match(/ÈÕÀÛ¼ÆÉê¹ºÏŞ¶î\s*([0-9,.]+)\s*(ÃÀÔª|ÈËÃñ±ÒÔª|Ôª)/);
+    flat.match(/æ—¥ç´¯è®¡ç”³è´­é™é¢\s*([0-9,.]+)\s*(ç¾å…ƒ|äººæ°‘å¸å…ƒ|å…ƒ)/);
   const dailyLimit =
     numberOf((dailyLimitMatch||[])[1]);
   const dailyLimitUnit =
     (dailyLimitMatch||[])[2]||null;
 
-  let purchaseSection = flatSection(flat,"Éê¹º·ÑÂÊ",["ÓÑÇéÌáÊ¾","Êê»Ø·ÑÂÊ"]);
+  let purchaseSection = flatSection(flat,"ç”³è´­è´¹ç‡",["å‹æƒ…æç¤º","èµå›è´¹ç‡"]);
   purchaseSection = purchaseSection
-    .replace(/^Éê¹º·ÑÂÊ\s*/,"")
+    .replace(/^ç”³è´­è´¹ç‡\s*/,"")
     .replace(/\s+/g," ")
     .trim();
-  if (purchaseSection.length > 520) purchaseSection = purchaseSection.slice(0,520)+"¡­";
+  if (purchaseSection.length > 520) purchaseSection = purchaseSection.slice(0,520)+"â€¦";
 
   const result = {
     cachedAt:new Date().toISOString(),
@@ -5879,7 +5834,7 @@ async function getOtcFeeDetails(code) {
     name:meta.name,
     company:meta.company,
     share:meta.share,
-    source:"ÌìÌì»ù½ğ/¶«·½²Æ¸»Choice",
+    source:"å¤©å¤©åŸºé‡‘/ä¸œæ–¹è´¢å¯ŒChoice",
     sourceUrl,
     managementFee:management ?? meta.managementFee,
     custodyFee:custody ?? meta.custodyFee,
@@ -5888,7 +5843,7 @@ async function getOtcFeeDetails(code) {
     currentPurchaseFee:currentPurchase,
     eastmoneyDailyLimit:dailyLimit,
     eastmoneyDailyLimitUnit:dailyLimitUnit,
-    purchaseFeeText:purchaseSection || "Ò³ÃæÎ´½âÎöµ½Éê¹º·ÑÂÊ±í£¬ÇëÒÔ»ù½ğ¹«Ë¾/ÏúÊÛÇşµÀ×îÖÕÒ³ÃæÎª×¼¡£"
+    purchaseFeeText:purchaseSection || "é¡µé¢æœªè§£æåˆ°ç”³è´­è´¹ç‡è¡¨ï¼Œè¯·ä»¥åŸºé‡‘å…¬å¸/é”€å”®æ¸ é“æœ€ç»ˆé¡µé¢ä¸ºå‡†ã€‚"
   };
 
   await saveJsonCache(cacheKey,result,12*3600);
@@ -5903,45 +5858,45 @@ function parseUsdFundPageStatus(
   const flat=stripHtml(html);
 
   const statusMatch=flat.match(
-    /½»Ò××´Ì¬[:£º]?\s*(ÔİÍ£Éê¹º|¿ª·ÅÉê¹º|ÏŞ´ó¶î|·â±ÕÆÚ|·â±Õ)/
+    /äº¤æ˜“çŠ¶æ€[:ï¼š]?\s*(æš‚åœç”³è´­|å¼€æ”¾ç”³è´­|é™å¤§é¢|å°é—­æœŸ|å°é—­)/
   );
 
   const rawStatus=
     statusMatch?.[1]||null;
 
   if(
-    rawStatus==="ÔİÍ£Éê¹º" ||
-    rawStatus==="·â±ÕÆÚ" ||
-    rawStatus==="·â±Õ" ||
-    /¸Ã»ù½ğÔİ²»¿ª·Å¹ºÂò/.test(flat)
+    rawStatus==="æš‚åœç”³è´­" ||
+    rawStatus==="å°é—­æœŸ" ||
+    rawStatus==="å°é—­" ||
+    /è¯¥åŸºé‡‘æš‚ä¸å¼€æ”¾è´­ä¹°/.test(flat)
   ){
     return {
       status:"suspended",
       statusLabel:
-        rawStatus==="·â±ÕÆÚ" ||
-        rawStatus==="·â±Õ"
-          ?"·â±ÕÆÚ"
-          :"ÔİÍ£Éê¹º"
+        rawStatus==="å°é—­æœŸ" ||
+        rawStatus==="å°é—­"
+          ?"å°é—­æœŸ"
+          :"æš‚åœç”³è´­"
     };
   }
 
-  if(rawStatus==="ÏŞ´ó¶î"){
+  if(rawStatus==="é™å¤§é¢"){
     return {
       status:"limited",
-      statusLabel:"ÏŞ´ó¶î"
+      statusLabel:"é™å¤§é¢"
     };
   }
 
-  if(rawStatus==="¿ª·ÅÉê¹º"){
+  if(rawStatus==="å¼€æ”¾ç”³è´­"){
     return {
       status:"open",
-      statusLabel:"¿ª·ÅÉê¹º"
+      statusLabel:"å¼€æ”¾ç”³è´­"
     };
   }
 
   return {
     status:"missing",
-    statusLabel:"×´Ì¬Î´½âÎö"
+    statusLabel:"çŠ¶æ€æœªè§£æ"
   };
 }
 
@@ -5981,7 +5936,7 @@ function orderedCodesInNotice(
 
   const heading=
     source.match(
-      /½»\s*Ò×\s*´ú\s*Âë/
+      /äº¤\s*æ˜“\s*ä»£\s*ç /
     );
 
   const pos=
@@ -6074,9 +6029,9 @@ function shareFlagMapFromNotice(
   const flags=
     tokensAfterHeading(
       text,
-      /(?:¸Ã\s*)?(?:·Ö\s*¼¶\s*»ù½ğ|»ù½ğ·İ¶î)?\s*ÊÇ\s*·ñ\s*Ôİ\s*Í£(?:\s*´ó\s*¶î)?\s*Éê\s*¹º[^ÊÇ|·ñ|-]{0,180}/,
-      /ÏŞ\s*ÖÆ\s*Éê\s*¹º\s*½ğ\s*¶î|ÏŞÖÆÉê¹º½ğ¶î|2\./,
-      /(?:^|\s)(ÊÇ|·ñ|-)(?=\s|$)/g,
+      /(?:è¯¥\s*)?(?:åˆ†\s*çº§\s*åŸºé‡‘|åŸºé‡‘ä»½é¢)?\s*æ˜¯\s*å¦\s*æš‚\s*åœ(?:\s*å¤§\s*é¢)?\s*ç”³\s*è´­[^æ˜¯|å¦|-]{0,180}/,
+      /é™\s*åˆ¶\s*ç”³\s*è´­\s*é‡‘\s*é¢|é™åˆ¶ç”³è´­é‡‘é¢|2\./,
+      /(?:^|\s)(æ˜¯|å¦|-)(?=\s|$)/g,
       1000
     );
 
@@ -6108,11 +6063,11 @@ function shareLimitMapFromNotice(
 
   const heading=
     source.match(
-      /(?:ÏÂ\s*Êô\s*·Ö\s*¼¶\s*»ù\s*½ğ\s*µÄ|ÏÂ\s*Êô\s*»ù\s*½ğ\s*·İ\s*¶î\s*µÄ)?\s*ÏŞ\s*ÖÆ\s*Éê\s*¹º\s*½ğ\s*¶î/
+      /(?:ä¸‹\s*å±\s*åˆ†\s*çº§\s*åŸº\s*é‡‘\s*çš„|ä¸‹\s*å±\s*åŸº\s*é‡‘\s*ä»½\s*é¢\s*çš„)?\s*é™\s*åˆ¶\s*ç”³\s*è´­\s*é‡‘\s*é¢/
     );
 
   // Layout A:
-  // ÏŞÖÆÉê¹º½ğ¶î 1ÃÀÔª 10Ôª 1ÃÀÔª ...
+  // é™åˆ¶ç”³è´­é‡‘é¢ 1ç¾å…ƒ 10å…ƒ 1ç¾å…ƒ ...
   if(
     heading &&
     heading.index!==undefined
@@ -6128,7 +6083,7 @@ function shareLimitMapFromNotice(
 
     const stop=
       tail.search(
-        /(?:ÏÂ\s*Êô\s*·Ö\s*¼¶\s*»ù\s*½ğ\s*µÄ|ÏÂ\s*Êô\s*»ù\s*½ğ\s*·İ\s*¶î\s*µÄ)?\s*ÏŞ\s*ÖÆ\s*(?:¶¨\s*ÆÚ\s*¶¨\s*¶î|×ª\s*»»\s*×ª\s*Èë)|2\.\s*ÆäËû/
+        /(?:ä¸‹\s*å±\s*åˆ†\s*çº§\s*åŸº\s*é‡‘\s*çš„|ä¸‹\s*å±\s*åŸº\s*é‡‘\s*ä»½\s*é¢\s*çš„)?\s*é™\s*åˆ¶\s*(?:å®š\s*æœŸ\s*å®š\s*é¢|è½¬\s*æ¢\s*è½¬\s*å…¥)|2\.\s*å…¶ä»–/
       );
 
     if(stop>=0){
@@ -6139,7 +6094,7 @@ function shareLimitMapFromNotice(
 
     for(
       const tm of tail.matchAll(
-        /([0-9][0-9,.]*)\s*(ÃÀÔª|ÈËÃñ±ÒÔª|Ôª)/g
+        /([0-9][0-9,.]*)\s*(ç¾å…ƒ|äººæ°‘å¸å…ƒ|å…ƒ)/g
       )
     ){
       combined.push({
@@ -6170,11 +6125,11 @@ function shareLimitMapFromNotice(
   }
 
   // Layout B:
-  // ½ğ¶îµ¥Î» ÈËÃñ±ÒÔª ÈËÃñ±ÒÔª ÃÀÔª ÃÀÔª
-  // ÏŞÖÆÉê¹º½ğ¶î 10.00 10.00 2.00 2.00
+  // é‡‘é¢å•ä½ äººæ°‘å¸å…ƒ äººæ°‘å¸å…ƒ ç¾å…ƒ ç¾å…ƒ
+  // é™åˆ¶ç”³è´­é‡‘é¢ 10.00 10.00 2.00 2.00
   const unitHeading=
     source.match(
-      /½ğ¶îµ¥Î»/
+      /é‡‘é¢å•ä½/
     );
 
   if(
@@ -6194,7 +6149,7 @@ function shareLimitMapFromNotice(
 
     const units=[
       ...unitText.matchAll(
-        /ÈËÃñ±ÒÔª|ÃÀÔª|(?<!ÈËÃñ±Ò)Ôª/g
+        /äººæ°‘å¸å…ƒ|ç¾å…ƒ|(?<!äººæ°‘å¸)å…ƒ/g
       )
     ].map(
       m=>m[0]
@@ -6211,7 +6166,7 @@ function shareLimitMapFromNotice(
 
     const stop=
       amountText.search(
-        /(?:ÏÂÊô·Ö¼¶»ù½ğµÄ|ÏÂÊô»ù½ğ·İ¶îµÄ)?ÏŞÖÆ(?:¶¨ÆÚ¶¨¶î|×ª»»×ªÈë)|2\.\s*ÆäËû/
+        /(?:ä¸‹å±åˆ†çº§åŸºé‡‘çš„|ä¸‹å±åŸºé‡‘ä»½é¢çš„)?é™åˆ¶(?:å®šæœŸå®šé¢|è½¬æ¢è½¬å…¥)|2\.\s*å…¶ä»–/
       );
 
     if(stop>=0){
@@ -6259,11 +6214,11 @@ function shareLimitMapFromNotice(
   }
 
   // Layout C:
-  // ÏŞÖÆ...½ğ¶î£¨µ¥Î»£ºÃÀÔª£©
+  // é™åˆ¶...é‡‘é¢ï¼ˆå•ä½ï¼šç¾å…ƒï¼‰
   // 016056 15 / 016058 15
   const usdRowMatch=
     source.match(
-      /ÏŞÖÆ[^¡££»]{0,120}?½ğ¶î\s*[£¨(]µ¥Î»[:£º]?\s*ÃÀÔª[£©)]/
+      /é™åˆ¶[^ã€‚ï¼›]{0,120}?é‡‘é¢\s*[ï¼ˆ(]å•ä½[:ï¼š]?\s*ç¾å…ƒ[ï¼‰)]/
     );
 
   if(
@@ -6316,9 +6271,9 @@ function shareLimitMapFromNotice(
             code,
             {
               value,
-              unit:"ÃÀÔª",
+              unit:"ç¾å…ƒ",
               raw:
-                `${value}ÃÀÔª`
+                `${value}ç¾å…ƒ`
             }
           );
         }
@@ -6340,11 +6295,11 @@ function genericUsdLimitFromNotice(
     normalizeNoticeText(text);
 
   const patterns=[
-    /ÃÀÔª(?:ÏÖ»ã|ÏÖ³®)?(?:»ù½ğ)?·İ¶î[^¡££»]{0,260}?(?:²»Ó¦³¬¹ı|Ó¦²»³¬¹ı|²»µÃ³¬¹ı|ÏŞÖÆ½ğ¶îÎª|ÒµÎñÏŞ¶îÎª|ÏŞ¶îÎª)\s*([0-9][0-9,.]*)\s*ÃÀÔª/i,
-    /ÃÀÔª[^¡££»]{0,160}?·İ¶î[^¡££»]{0,260}?(?:ÏŞ¶î|ÏŞÖÆ½ğ¶î)[^0-9]{0,40}([0-9][0-9,.]*)\s*ÃÀÔª/i,
-    /ÏŞÖÆ½ğ¶îÎª\s*([0-9][0-9,.]*)\s*ÃÀÔª[^¡££»]{0,260}?ÃÀÔª(?:ÏÖ»ã|ÏÖ³®|·İ¶î)/i,
-    /±¾»ù½ğÃÀÔª(?:ÏÖ»ã|ÏÖ³®)?»ù½ğ·İ¶î[^¡££»]{0,300}?ÀÛ¼Æ½ğ¶î(?:Ó¦)?²»³¬¹ı\s*([0-9][0-9,.]*)\s*ÃÀÔª/i,
-    /ÃÀÔª(?:ÏÖ»ã|ÏÖ³®)[^¡££»]{0,260}?(?:²»Ó¦³¬¹ı|Ó¦²»³¬¹ı|²»µÃ³¬¹ı)\s*([0-9][0-9,.]*)\s*ÃÀÔª/i
+    /ç¾å…ƒ(?:ç°æ±‡|ç°é’)?(?:åŸºé‡‘)?ä»½é¢[^ã€‚ï¼›]{0,260}?(?:ä¸åº”è¶…è¿‡|åº”ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡|é™åˆ¶é‡‘é¢ä¸º|ä¸šåŠ¡é™é¢ä¸º|é™é¢ä¸º)\s*([0-9][0-9,.]*)\s*ç¾å…ƒ/i,
+    /ç¾å…ƒ[^ã€‚ï¼›]{0,160}?ä»½é¢[^ã€‚ï¼›]{0,260}?(?:é™é¢|é™åˆ¶é‡‘é¢)[^0-9]{0,40}([0-9][0-9,.]*)\s*ç¾å…ƒ/i,
+    /é™åˆ¶é‡‘é¢ä¸º\s*([0-9][0-9,.]*)\s*ç¾å…ƒ[^ã€‚ï¼›]{0,260}?ç¾å…ƒ(?:ç°æ±‡|ç°é’|ä»½é¢)/i,
+    /æœ¬åŸºé‡‘ç¾å…ƒ(?:ç°æ±‡|ç°é’)?åŸºé‡‘ä»½é¢[^ã€‚ï¼›]{0,300}?ç´¯è®¡é‡‘é¢(?:åº”)?ä¸è¶…è¿‡\s*([0-9][0-9,.]*)\s*ç¾å…ƒ/i,
+    /ç¾å…ƒ(?:ç°æ±‡|ç°é’)[^ã€‚ï¼›]{0,260}?(?:ä¸åº”è¶…è¿‡|åº”ä¸è¶…è¿‡|ä¸å¾—è¶…è¿‡)\s*([0-9][0-9,.]*)\s*ç¾å…ƒ/i
   ];
 
   for(const p of patterns){
@@ -6395,12 +6350,12 @@ function extractUsdChannelLimit(
   const channelPatterns=
     channel==="direct"
       ?[
-          /(?:±¾¹«Ë¾\s*)?(?:Ö±\s*Ïú\s*Çş\s*µÀ|Ö±\s*Ïú\s*»ú\s*¹¹|Ö±\s*Ïú\s*¹ñ\s*Ì¨|ÍøÉÏÖ±Ïú)[^¡££»]{0,900}?ÃÀÔª(?:ÏÖ»ã|ÏÖ³®)?(?:»ù½ğ)?·İ¶î[^¡££»]{0,320}?(?:ÀÛ¼Æ½ğ¶î)?(?:Ó¦)?²»³¬¹ı\s*([0-9][0-9,.]*)\s*(Íò)?\s*ÃÀÔª/i,
-          /(?:±¾¹«Ë¾\s*)?(?:Ö±\s*Ïú\s*Çş\s*µÀ|Ö±\s*Ïú\s*»ú\s*¹¹|Ö±\s*Ïú\s*¹ñ\s*Ì¨)[^¡££»]{0,900}?ÃÀÔª[^¡££»]{0,320}?(?:ÏŞ¶î|ÏŞÖÆ½ğ¶î|ÉÏÏŞ)(?:Îª|µ÷ÕûÎª)?\s*([0-9][0-9,.]*)\s*(Íò)?\s*ÃÀÔª/i
+          /(?:æœ¬å…¬å¸\s*)?(?:ç›´\s*é”€\s*æ¸ \s*é“|ç›´\s*é”€\s*æœº\s*æ„|ç›´\s*é”€\s*æŸœ\s*å°|ç½‘ä¸Šç›´é”€)[^ã€‚ï¼›]{0,900}?ç¾å…ƒ(?:ç°æ±‡|ç°é’)?(?:åŸºé‡‘)?ä»½é¢[^ã€‚ï¼›]{0,320}?(?:ç´¯è®¡é‡‘é¢)?(?:åº”)?ä¸è¶…è¿‡\s*([0-9][0-9,.]*)\s*(ä¸‡)?\s*ç¾å…ƒ/i,
+          /(?:æœ¬å…¬å¸\s*)?(?:ç›´\s*é”€\s*æ¸ \s*é“|ç›´\s*é”€\s*æœº\s*æ„|ç›´\s*é”€\s*æŸœ\s*å°)[^ã€‚ï¼›]{0,900}?ç¾å…ƒ[^ã€‚ï¼›]{0,320}?(?:é™é¢|é™åˆ¶é‡‘é¢|ä¸Šé™)(?:ä¸º|è°ƒæ•´ä¸º)?\s*([0-9][0-9,.]*)\s*(ä¸‡)?\s*ç¾å…ƒ/i
         ]
       :[
-          /(?:¸÷\s*´ú\s*Ïú\s*»ú\s*¹¹|´ú\s*Ïú\s*»ú\s*¹¹|´ú\s*Ïú\s*Çş\s*µÀ)[^¡££»]{0,900}?ÃÀÔª(?:ÏÖ»ã|ÏÖ³®)?(?:»ù½ğ)?·İ¶î[^¡££»]{0,320}?(?:ÀÛ¼Æ½ğ¶î)?(?:Ó¦)?²»³¬¹ı\s*([0-9][0-9,.]*)\s*(Íò)?\s*ÃÀÔª/i,
-          /(?:¸÷\s*´ú\s*Ïú\s*»ú\s*¹¹|´ú\s*Ïú\s*»ú\s*¹¹|´ú\s*Ïú\s*Çş\s*µÀ)[^¡££»]{0,900}?ÃÀÔª[^¡££»]{0,320}?(?:ÏŞ¶î|ÏŞÖÆ½ğ¶î|ÉÏÏŞ)(?:Îª|µ÷ÕûÎª)?\s*([0-9][0-9,.]*)\s*(Íò)?\s*ÃÀÔª/i
+          /(?:å„\s*ä»£\s*é”€\s*æœº\s*æ„|ä»£\s*é”€\s*æœº\s*æ„|ä»£\s*é”€\s*æ¸ \s*é“)[^ã€‚ï¼›]{0,900}?ç¾å…ƒ(?:ç°æ±‡|ç°é’)?(?:åŸºé‡‘)?ä»½é¢[^ã€‚ï¼›]{0,320}?(?:ç´¯è®¡é‡‘é¢)?(?:åº”)?ä¸è¶…è¿‡\s*([0-9][0-9,.]*)\s*(ä¸‡)?\s*ç¾å…ƒ/i,
+          /(?:å„\s*ä»£\s*é”€\s*æœº\s*æ„|ä»£\s*é”€\s*æœº\s*æ„|ä»£\s*é”€\s*æ¸ \s*é“)[^ã€‚ï¼›]{0,900}?ç¾å…ƒ[^ã€‚ï¼›]{0,320}?(?:é™é¢|é™åˆ¶é‡‘é¢|ä¸Šé™)(?:ä¸º|è°ƒæ•´ä¸º)?\s*([0-9][0-9,.]*)\s*(ä¸‡)?\s*ç¾å…ƒ/i
         ];
 
   for(const p of channelPatterns){
@@ -6428,13 +6383,13 @@ function explicitUsdSuspendFromNotice(
     normalizeNoticeText(text);
 
   return (
-    /ÃÀÔª(?:ÏÖ³®|ÏÖ»ã)[^¡££»]{0,260}?(?:ÈÔ)?ÔİÍ£Éê¹º/.test(
+    /ç¾å…ƒ(?:ç°é’|ç°æ±‡)[^ã€‚ï¼›]{0,260}?(?:ä»)?æš‚åœç”³è´­/.test(
       source
     ) ||
-    /ÃÀÔª(?:ÏÖ³®|ÏÖ»ã)[^¡££»]{0,220}?·İ¶î[^¡££»]{0,220}?ÔİÍ£Éê¹º/.test(
+    /ç¾å…ƒ(?:ç°é’|ç°æ±‡)[^ã€‚ï¼›]{0,220}?ä»½é¢[^ã€‚ï¼›]{0,220}?æš‚åœç”³è´­/.test(
       source
     ) ||
-    /ÃÀÔª·İ¶î[^¡££»]{0,260}?(?:ÈÔ)?ÔİÍ£Éê¹º/.test(
+    /ç¾å…ƒä»½é¢[^ã€‚ï¼›]{0,260}?(?:ä»)?æš‚åœç”³è´­/.test(
       source
     )
   );
@@ -6452,24 +6407,24 @@ function broadFullSuspendFromNotice(
 
   if(
     !(
-      /ÔİÍ£Éê¹º/.test(t) &&
-      !/ÔİÍ£´ó¶îÉê¹º/.test(t)
+      /æš‚åœç”³è´­/.test(t) &&
+      !/æš‚åœå¤§é¢ç”³è´­/.test(t)
     )
   ){
     return false;
   }
 
-  // Ã÷È·Ö»Õë¶ÔÈËÃñ±ÒµÄ¹«¸æ²»ÄÜÀ©É¢µ½ÃÀÔª·İ¶î¡£
+  // æ˜ç¡®åªé’ˆå¯¹äººæ°‘å¸çš„å…¬å‘Šä¸èƒ½æ‰©æ•£åˆ°ç¾å…ƒä»½é¢ã€‚
   if(
-    /½ö[^¡££»]{0,80}ÈËÃñ±Ò/.test(source) ||
-    /±¾´Î[^¡££»]{0,120}½öÕë¶Ô[^¡££»]{0,80}ÈËÃñ±Ò/.test(source)
+    /ä»…[^ã€‚ï¼›]{0,80}äººæ°‘å¸/.test(source) ||
+    /æœ¬æ¬¡[^ã€‚ï¼›]{0,120}ä»…é’ˆå¯¹[^ã€‚ï¼›]{0,80}äººæ°‘å¸/.test(source)
   ){
     return false;
   }
 
   return (
-    /±¾»ù½ğ[^¡££»]{0,100}?ÔİÍ£Éê¹º/.test(source) ||
-    /ÔİÍ£Éê¹º(?:¼°|¡¢|\(|£¨|ÒµÎñ)/.test(t)
+    /æœ¬åŸºé‡‘[^ã€‚ï¼›]{0,100}?æš‚åœç”³è´­/.test(source) ||
+    /æš‚åœç”³è´­(?:åŠ|ã€|\(|ï¼ˆ|ä¸šåŠ¡)/.test(t)
   );
 }
 
@@ -6502,7 +6457,7 @@ function parseUsdOfficialNotice(
     temporaryDate:
       dates.temporaryDate,
     isHoliday:
-      /½Ú¼ÙÈÕ|¾³ÍâÖ÷ÒªÍ¶×Ê³¡Ëù/.test(
+      /èŠ‚å‡æ—¥|å¢ƒå¤–ä¸»è¦æŠ•èµ„åœºæ‰€/.test(
         title
       ),
     publishDate:
@@ -6560,28 +6515,28 @@ function parseUsdOfficialNotice(
     );
 
   const isRecovery=
-    /»Ö¸´(?:Õı³£)?(?:´ó¶î)?Éê¹º/.test(
+    /æ¢å¤(?:æ­£å¸¸)?(?:å¤§é¢)?ç”³è´­/.test(
       title
     );
 
   const isFullSuspend=
     (
-      /ÔİÍ£Éê¹º/.test(title) &&
-      !/ÔİÍ£´ó¶îÉê¹º/.test(title)
+      /æš‚åœç”³è´­/.test(title) &&
+      !/æš‚åœå¤§é¢ç”³è´­/.test(title)
     ) ||
     (
-      /ÔİÍ£(?:°ìÀí)?Éê¹º/.test(full) &&
-      !/´ó¶îÉê¹º/.test(title) &&
-      /ÔİÍ£Éê¹º(?:¼°|¡¢|ÒµÎñ)/.test(
+      /æš‚åœ(?:åŠç†)?ç”³è´­/.test(full) &&
+      !/å¤§é¢ç”³è´­/.test(title) &&
+      /æš‚åœç”³è´­(?:åŠ|ã€|ä¸šåŠ¡)/.test(
         title
       )
     );
 
   const isLimited=
-    /(?:ÔİÍ£|ÏŞÖÆ|µ÷Õû).*´ó¶îÉê¹º/.test(
+    /(?:æš‚åœ|é™åˆ¶|è°ƒæ•´).*å¤§é¢ç”³è´­/.test(
       title
     ) ||
-    /´ó¶îÉê¹º.*(?:ÔİÍ£|ÏŞÖÆ|µ÷Õû)/.test(
+    /å¤§é¢ç”³è´­.*(?:æš‚åœ|é™åˆ¶|è°ƒæ•´)/.test(
       title
     );
 
@@ -6647,7 +6602,7 @@ function usdNoticeAffectsCode(
 
   if(
     flag==="-" ||
-    flag==="·ñ"
+    flag==="å¦"
   ){
     return false;
   }
@@ -6685,7 +6640,7 @@ function applyUsdNoticeToRow(
 
   const tableUsdLimit=
     limit &&
-    limit.unit==="ÃÀÔª" &&
+    limit.unit==="ç¾å…ƒ" &&
     hasFiniteValue(
       limit.value
     )
@@ -6737,8 +6692,8 @@ function applyUsdNoticeToRow(
         :null;
   };
 
-  // »ª°²µÈ¹«¸æ¿ÉÄÜÕıÎÄÃ÷È·ËµÃ÷ÃÀÔª·İ¶î¼ÌĞøÔİÍ££¬
-  // ¼´Ê¹±¾´Î¹«¸æ±í¸ñÖ»ÁĞÈËÃñ±Ò·İ¶î£¬Ò²Ó¦¸²¸ÇÃÀÔª×´Ì¬¡£
+  // åå®‰ç­‰å…¬å‘Šå¯èƒ½æ­£æ–‡æ˜ç¡®è¯´æ˜ç¾å…ƒä»½é¢ç»§ç»­æš‚åœï¼Œ
+  // å³ä½¿æœ¬æ¬¡å…¬å‘Šè¡¨æ ¼åªåˆ—äººæ°‘å¸ä»½é¢ï¼Œä¹Ÿåº”è¦†ç›–ç¾å…ƒçŠ¶æ€ã€‚
   if(
     parsed.explicitUsdSuspend ||
     parsed.broadFullSuspend
@@ -6771,8 +6726,8 @@ function applyUsdNoticeToRow(
     return;
   }
 
-  // ¹«¸æÕıÎÄ·Ö±ğÅûÂ¶´úÏú / Ö±ÏúÃÀÔªÏŞ¶îÊ±£¬
-  // ±ØĞë±£ÁôÁ½¸öÇşµÀ¸÷×Ô½ğ¶î£¬ÀıÈç²©Ê±£º15ÃÀÔª / 15ÍòÃÀÔª¡£
+  // å…¬å‘Šæ­£æ–‡åˆ†åˆ«æŠ«éœ²ä»£é”€ / ç›´é”€ç¾å…ƒé™é¢æ—¶ï¼Œ
+  // å¿…é¡»ä¿ç•™ä¸¤ä¸ªæ¸ é“å„è‡ªé‡‘é¢ï¼Œä¾‹å¦‚åšæ—¶ï¼š15ç¾å…ƒ / 15ä¸‡ç¾å…ƒã€‚
   let appliedExplicitChannel=false;
 
   if(
@@ -6802,7 +6757,7 @@ function applyUsdNoticeToRow(
   }
 
   if(appliedExplicitChannel){
-    // Èç¹ûÖ»ÅûÂ¶Ò»¸öÇşµÀ£¬ÁíÒ»¸öÇşµÀÈÔÔÊĞíºóĞø table/general Âß¼­²¹Æë¡£
+    // å¦‚æœåªæŠ«éœ²ä¸€ä¸ªæ¸ é“ï¼Œå¦ä¸€ä¸ªæ¸ é“ä»å…è®¸åç»­ table/general é€»è¾‘è¡¥é½ã€‚
     const fallback=
       hasFiniteValue(
         tableUsdLimit
@@ -6923,26 +6878,26 @@ function finalizeUsdOfficialState(
 
   let status="missing";
   let statusLabel=
-    "¹«¸æ×´Ì¬Î´½âÎö";
+    "å…¬å‘ŠçŠ¶æ€æœªè§£æ";
 
   if(
     agencyState==="suspended" &&
     directState==="suspended"
   ){
     status="suspended";
-    statusLabel="ÔİÍ£Éê¹º";
+    statusLabel="æš‚åœç”³è´­";
   }else if(
     agencyState==="limited" ||
     directState==="limited"
   ){
     status="limited";
-    statusLabel="ÏŞ´ó¶î";
+    statusLabel="é™å¤§é¢";
   }else if(
     agencyState==="open" &&
     directState==="open"
   ){
     status="open";
-    statusLabel="¿ª·ÅÉê¹º";
+    statusLabel="å¼€æ”¾ç”³è´­";
   }
 
   const bestLimit=
@@ -6980,12 +6935,12 @@ function finalizeUsdOfficialState(
     directInferredFromAgency:false,
     limitText:
       hasFiniteValue(bestLimit)
-        ?`${bestLimit}ÃÀÔª/ÈÕ`
+        ?`${bestLimit}ç¾å…ƒ/æ—¥`
         :statusLabel,
     channelText:
-      "ÃÀÔª·İ¶î°´»ù½ğ¹ÜÀíÈË¹«¸æ½âÎö£»ÈËÃñ±ÒÓëÃÀÔª¶î¶È¶ÀÁ¢´¦Àí",
+      "ç¾å…ƒä»½é¢æŒ‰åŸºé‡‘ç®¡ç†äººå…¬å‘Šè§£æï¼›äººæ°‘å¸ä¸ç¾å…ƒé¢åº¦ç‹¬ç«‹å¤„ç†",
     announcementText:
-      latest?.title||"¡ª",
+      latest?.title||"â€”",
     sourceAnnouncementUrl:
       latest?.announcementUrl||null,
     latestOfficialAnnouncementUrl:
@@ -7018,22 +6973,22 @@ function finalizeUsdOfficialState(
         :"unverified",
     currentVerificationLabel:
       latest
-        ?"¹Ù·½¹«¸æ"
-        :"Î´ÑéÖ¤",
+        ?"å®˜æ–¹å…¬å‘Š"
+        :"æœªéªŒè¯",
     verificationStatus:
       latest
         ?"match"
         :"unverified",
     verificationLabel:
       latest
-        ?"¹Ù·½¹«¸æ"
-        :"Î´ÑéÖ¤",
+        ?"å®˜æ–¹å…¬å‘Š"
+        :"æœªéªŒè¯",
     anxinVerification:
-      "ÃÀÔª·İ¶î",
+      "ç¾å…ƒä»½é¢",
     quotaDate:today,
     checkDate:today,
     source:
-      "»ù½ğ¹ÜÀíÈË¹«¸æ",
+      "åŸºé‡‘ç®¡ç†äººå…¬å‘Š",
     sourceUrl:
       latest?.announcementUrl||
       `https://fund.eastmoney.com/${meta.code}.html`,
@@ -7055,10 +7010,10 @@ async function fetchUsdOfficialProduct(
       100
     );
 
-  // Äê¶È½Ú¼ÙÈÕÒÑÔÚÁĞ±í¹ıÂËÆ÷ÖĞÅÅ³ı¡£
-  // Ã¿¸ö²úÆ·×î¶à¶ÁÈ¡4Æª£º
-  // 2Æª×î½ü¹«¸æ + 1Æª½ÏÔçÒ»°ã¹«¸æ + 1Æª×î½üÍêÕûÔİÍ£¹«¸æ¡£
-  // 1´ÎÁĞ±í + ×î¶à4ÆªÕıÎÄ£¬ÃÀÔª²à×î¶àÔ¼5¸öÉÏÓÎÇëÇó¡£
+  // å¹´åº¦èŠ‚å‡æ—¥å·²åœ¨åˆ—è¡¨è¿‡æ»¤å™¨ä¸­æ’é™¤ã€‚
+  // æ¯ä¸ªäº§å“æœ€å¤šè¯»å–4ç¯‡ï¼š
+  // 2ç¯‡æœ€è¿‘å…¬å‘Š + 1ç¯‡è¾ƒæ—©ä¸€èˆ¬å…¬å‘Š + 1ç¯‡æœ€è¿‘å®Œæ•´æš‚åœå…¬å‘Šã€‚
+  // 1æ¬¡åˆ—è¡¨ + æœ€å¤š4ç¯‡æ­£æ–‡ï¼Œç¾å…ƒä¾§æœ€å¤šçº¦5ä¸ªä¸Šæ¸¸è¯·æ±‚ã€‚
   const chosen=
     notices.slice(0,2);
 
@@ -7081,13 +7036,13 @@ async function fetchUsdOfficialProduct(
         !chosen.some(
           x=>x.id===n.id
         ) &&
-        !/ÈËÃñ±Ò/.test(
+        !/äººæ°‘å¸/.test(
           n.title||""
         ) &&
-        !/Ö±Ïúµç×Ó½»Ò×Æ½Ì¨|Ö±Ïú»ú¹¹|´úÏú»ú¹¹/.test(
+        !/ç›´é”€ç”µå­äº¤æ˜“å¹³å°|ç›´é”€æœºæ„|ä»£é”€æœºæ„/.test(
           n.title||""
         ) &&
-        /ÔİÍ£Éê¹º|»Ö¸´Éê¹º|´ó¶îÉê¹º|ÏŞÖÆÉê¹º|µ÷Õû.*Éê¹º/.test(
+        /æš‚åœç”³è´­|æ¢å¤ç”³è´­|å¤§é¢ç”³è´­|é™åˆ¶ç”³è´­|è°ƒæ•´.*ç”³è´­/.test(
           n.title||""
         )
     );
@@ -7102,10 +7057,10 @@ async function fetchUsdOfficialProduct(
         !chosen.some(
           x=>x.id===n.id
         ) &&
-        /ÔİÍ£Éê¹º/.test(
+        /æš‚åœç”³è´­/.test(
           n.title||""
         ) &&
-        !/ÔİÍ£´ó¶îÉê¹º/.test(
+        !/æš‚åœå¤§é¢ç”³è´­/.test(
           n.title||""
         ) &&
         !isAnnualHolidaySchedule(
@@ -7140,7 +7095,7 @@ async function fetchUsdOfficialProduct(
     }catch(_){}
   }
 
-  // ¾É -> ĞÂË³ĞòÓ¦ÓÃ£¬Ê¹×îĞÂ¹«¸æ¸²¸Ç¾É×´Ì¬¡£
+  // æ—§ -> æ–°é¡ºåºåº”ç”¨ï¼Œä½¿æœ€æ–°å…¬å‘Šè¦†ç›–æ—§çŠ¶æ€ã€‚
   parsed.sort(
     (a,b)=>
       String(
@@ -7217,7 +7172,7 @@ async function fetchUsdFundSnapshot(
   let dailyLimit=null;
   let dailyLimitUnit=null;
 
-  // ÒÑÔİÍ£/·â±ÕÊ±ÎŞĞèÔÙ¶îÍâÇëÇó·ÑÂÊÒ³À´ÕÒ¶î¶È¡£
+  // å·²æš‚åœ/å°é—­æ—¶æ— éœ€å†é¢å¤–è¯·æ±‚è´¹ç‡é¡µæ¥æ‰¾é¢åº¦ã€‚
   if(
     parsed.status!=="suspended"
   ){
@@ -7230,10 +7185,10 @@ async function fetchUsdFundSnapshot(
       dailyLimitUnit=
         fee.eastmoneyDailyLimitUnit;
 
-      // ÃÀÔª·İ¶îÖ»½ÓÊÜÃ÷È·±ê×¢¡°ÃÀÔª¡±µÄÏŞ¶î£¬
-      // ¾ø²»°Ñ¡°Ôª¡±Êı×ÖÖ±½Óµ±×÷ÃÀÔª¶î¶È¡£
+      // ç¾å…ƒä»½é¢åªæ¥å—æ˜ç¡®æ ‡æ³¨â€œç¾å…ƒâ€çš„é™é¢ï¼Œ
+      // ç»ä¸æŠŠâ€œå…ƒâ€æ•°å­—ç›´æ¥å½“ä½œç¾å…ƒé¢åº¦ã€‚
       if(
-        dailyLimitUnit==="ÃÀÔª" &&
+        dailyLimitUnit==="ç¾å…ƒ" &&
         hasFiniteValue(
           fee.eastmoneyDailyLimit
         )
@@ -7256,7 +7211,7 @@ async function fetchUsdFundSnapshot(
     directState="suspended";
   }else if(hasFiniteValue(dailyLimit)){
     status="limited";
-    statusLabel="ÏŞ´ó¶î";
+    statusLabel="é™å¤§é¢";
     agencyState="limited";
     directState="limited";
   }else if(status==="open"){
@@ -7269,15 +7224,15 @@ async function fetchUsdFundSnapshot(
 
   const limitText=
     hasFiniteValue(dailyLimit)
-      ?`${dailyLimit}ÃÀÔª/ÈÕ`
+      ?`${dailyLimit}ç¾å…ƒ/æ—¥`
       :status==="suspended"
         ?statusLabel
-        :"ÃÀÔªÏŞ¶îÎ´Ã÷È·ÅûÂ¶";
+        :"ç¾å…ƒé™é¢æœªæ˜ç¡®æŠ«éœ²";
 
   const channelText=
     hasFiniteValue(dailyLimit)
-      ?"ÒÑÃ÷È·Ê¶±ğÃÀÔªÉê¹ºÏŞ¶î£»Ö±ÏúÎ´µ¥¶ÀÅûÂ¶Ê±°´ÏàÍ¬¶î¶ÈÕ¹Ê¾"
-      :"µ±Ç°½öºËÑéÃÀÔª·İ¶îÉê¹º×´Ì¬£»Î´Ê¶±ğµ½Ã÷È·ÃÀÔªÏŞ¶îÊ±²»ÍÆËã";
+      ?"å·²æ˜ç¡®è¯†åˆ«ç¾å…ƒç”³è´­é™é¢ï¼›ç›´é”€æœªå•ç‹¬æŠ«éœ²æ—¶æŒ‰ç›¸åŒé¢åº¦å±•ç¤º"
+      :"å½“å‰ä»…æ ¸éªŒç¾å…ƒä»½é¢ç”³è´­çŠ¶æ€ï¼›æœªè¯†åˆ«åˆ°æ˜ç¡®ç¾å…ƒé™é¢æ—¶ä¸æ¨ç®—";
 
   return {
     ...meta,
@@ -7299,7 +7254,7 @@ async function fetchUsdFundSnapshot(
       hasFiniteValue(dailyLimit),
     limitText,
     channelText,
-    announcementText:"¡ª",
+    announcementText:"â€”",
     sourceAnnouncementUrl:null,
     latestOfficialAnnouncementUrl:null,
     verificationAnnouncementUrl:null,
@@ -7315,17 +7270,17 @@ async function fetchUsdFundSnapshot(
     currentVerificationStatus:
       "unverified",
     currentVerificationLabel:
-      "×´Ì¬ºËÑé",
+      "çŠ¶æ€æ ¸éªŒ",
     verificationStatus:
       "unverified",
     verificationLabel:
-      "×´Ì¬ºËÑé",
+      "çŠ¶æ€æ ¸éªŒ",
     anxinVerification:
-      "ÃÀÔª·İ¶î",
+      "ç¾å…ƒä»½é¢",
     quotaDate:today,
     checkDate:today,
     source:
-      "ÌìÌì»ù½ğ/¶«·½²Æ¸»»ù½ğµ±Ç°×´Ì¬Ò³",
+      "å¤©å¤©åŸºé‡‘/ä¸œæ–¹è´¢å¯ŒåŸºé‡‘å½“å‰çŠ¶æ€é¡µ",
     sourceUrl,
     dataStatus:"fresh"
   };
@@ -7341,23 +7296,24 @@ async function loadUsdLastGood(){
 async function buildOtcUsdFunds({
   forceRefresh=false
 }={}) {
+  const today=
+    shanghaiNowParts().date;
+
   if(!forceRefresh){
     const cached=
       await loadTimedJsonCache(
         OTC_USD_RESULT_CACHE_URL,
-        15*60*1000
+        36*3600*1000
       );
 
-    if(cached){
+    if(cached?.checkDate===today){
       return {
         ...cached,
-        servedFromWorkerCache:true
+        servedFromWorkerCache:true,
+        servedFromDailyCache:true
       };
     }
   }
-
-  const today=
-    shanghaiNowParts().date;
 
   try{
     const groups=
@@ -7380,33 +7336,33 @@ async function buildOtcUsdFunds({
                   ...meta,
                   status:"missing",
                   statusLabel:
-                    "¹«¸æ¶ÁÈ¡Ê§°Ü",
+                    "å…¬å‘Šè¯»å–å¤±è´¥",
                   agencyLimit:null,
                   directLimit:null,
                   agencyState:"unknown",
                   directState:"unknown",
                   directInferredFromAgency:false,
                   limitText:
-                    "¹«¸æ¶ÁÈ¡Ê§°Ü",
-                  channelText:"¡ª",
-                  announcementText:"¡ª",
+                    "å…¬å‘Šè¯»å–å¤±è´¥",
+                  channelText:"â€”",
+                  announcementText:"â€”",
                   sourceAnnouncementUrl:null,
                   latestOfficialAnnouncementUrl:null,
                   verificationAnnouncementUrl:null,
                   currentVerificationStatus:
                     "unverified",
                   currentVerificationLabel:
-                    "Î´ÑéÖ¤",
+                    "æœªéªŒè¯",
                   verificationStatus:
                     "unverified",
                   verificationLabel:
-                    "Î´ÑéÖ¤",
+                    "æœªéªŒè¯",
                   anxinVerification:
-                    "ÃÀÔª·İ¶î",
+                    "ç¾å…ƒä»½é¢",
                   quotaDate:today,
                   checkDate:today,
                   source:
-                    "»ù½ğ¹ÜÀíÈË¹«¸æ",
+                    "åŸºé‡‘ç®¡ç†äººå…¬å‘Š",
                   sourceUrl:
                     `https://fund.eastmoney.com/${code}.html`,
                   dataStatus:"missing",
@@ -7432,7 +7388,7 @@ async function buildOtcUsdFunds({
       ).length,
       total:OTC_USD_META.length,
       source:
-        "»ù½ğ¹ÜÀíÈË¹«¸æ",
+        "åŸºé‡‘ç®¡ç†äººå…¬å‘Š",
       rows,
       summary:{
         limited:rows.filter(
@@ -7469,7 +7425,7 @@ async function buildOtcUsdFunds({
         cachedAt:
           new Date().toISOString()
       },
-      15*60
+      36*3600
     );
 
     return result;
@@ -7526,10 +7482,10 @@ function parseFundNetWorthScript(code,js,includeHistory=false) {
     const ts = Number(item?.x);
     if (!Number.isFinite(ts)) continue;
 
-    // Eastmoney µÄ¾»ÖµÊ±¼ä´Á±íÊ¾±±¾©Ê±¼äÈÕÆÚ¡£
-    // Worker ÔËĞĞÔÚ UTC£¬Èç¹ûÖ±½Ó toISOString().slice(0,10)£¬
-    // »á°Ñ±±¾©Ê±¼ä 00:00 Ó³Éäµ½Ç°Ò»Ìì UTC£¬µ¼ÖÂ¾»ÖµÈÕÆÚÕûÌåÔçÒ»Ìì¡£
-    // ¼Ó 8 Ğ¡Ê±ºóÔÙ°´ UTC È¡ YYYY-MM-DD£¬µÈ¼ÛÓÚ°´ Asia/Shanghai ÈÕÆÚ½âÊÍ¡£
+    // Eastmoney çš„å‡€å€¼æ—¶é—´æˆ³è¡¨ç¤ºåŒ—äº¬æ—¶é—´æ—¥æœŸã€‚
+    // Worker è¿è¡Œåœ¨ UTCï¼Œå¦‚æœç›´æ¥ toISOString().slice(0,10)ï¼Œ
+    // ä¼šæŠŠåŒ—äº¬æ—¶é—´ 00:00 æ˜ å°„åˆ°å‰ä¸€å¤© UTCï¼Œå¯¼è‡´å‡€å€¼æ—¥æœŸæ•´ä½“æ—©ä¸€å¤©ã€‚
+    // åŠ  8 å°æ—¶åå†æŒ‰ UTC å– YYYY-MM-DDï¼Œç­‰ä»·äºæŒ‰ Asia/Shanghai æ—¥æœŸè§£é‡Šã€‚
     const shanghaiDt =
       new Date(ts + 8*60*60*1000);
     const year =
@@ -7900,8 +7856,8 @@ async function fetchFundNetWorthData(
       includeHistory
     );
   }catch(primaryError){
-    // Ä³Ğ©ÃÀÔª·İ¶î£¨Ä¿Ç°Ö÷ÒªÊÇ ±¦Ó¯ 019738/019739£©
-    // pingzhongdata µÄ Data_netWorthTrend Îª¿Õ£¬µ«ÀúÊ·¾»Öµ API Õı³£¡£
+    // æŸäº›ç¾å…ƒä»½é¢ï¼ˆç›®å‰ä¸»è¦æ˜¯ å®ç›ˆ 019738/019739ï¼‰
+    // pingzhongdata çš„ Data_netWorthTrend ä¸ºç©ºï¼Œä½†å†å²å‡€å€¼ API æ­£å¸¸ã€‚
     try{
       return await fetchFundNetWorthFallback(
         code,
@@ -7924,7 +7880,7 @@ async function annualPerformance(code) {
 
   return {
     code,
-    source:"»ù½ğ¾»Öµ×ßÊÆ",
+    source:"åŸºé‡‘å‡€å€¼èµ°åŠ¿",
     sourceUrl:
       `https://fund.eastmoney.com/${code}.html`,
     latestNav:x.latestNav,
@@ -7960,21 +7916,30 @@ async function otcNavSummary({
     OTC_NAV_SUMMARY_CACHE_PREFIX+
     normalized;
 
+  const minimumMatched=
+    normalized==="USD"
+      ?metaList.length
+      :Math.min(30,metaList.length);
+
   if (!forceRefresh) {
     const cached =
       await loadTimedJsonCache(
         cacheKey,
-        2*3600*1000
+        36*3600*1000
       );
-    if (cached) {
+    if (
+      cached?.checkDate===shanghaiNowParts().date &&
+      Number(cached.matched)>=minimumMatched
+    ) {
       return {
         ...cached,
-        servedFromCache:true
+        servedFromCache:true,
+        servedFromDailyCache:true
       };
     }
   }
 
-  // CNY 41¸ö¡¢USD 2¸ö·Ö¿ªÇëÇó£¬±ÜÃâ³¬¹ıµ¥´ÎÉÏÓÎ×ÓÇëÇóÔ¤Ëã¡£
+  // CNY 41ä¸ªã€USD 2ä¸ªåˆ†å¼€è¯·æ±‚ï¼Œé¿å…è¶…è¿‡å•æ¬¡ä¸Šæ¸¸å­è¯·æ±‚é¢„ç®—ã€‚
   const results = await mapLimit(
     metaList,
     6,
@@ -8014,6 +7979,7 @@ async function otcNavSummary({
   const result = {
     generatedAt:
       new Date().toISOString(),
+    checkDate:shanghaiNowParts().date,
     currency:normalized,
     total:metaList.length,
     matched:results.filter(
@@ -8034,7 +8000,7 @@ async function otcNavSummary({
       cachedAt:
         new Date().toISOString()
     },
-    2*3600
+    36*3600
   );
 
   return result;
@@ -8048,7 +8014,7 @@ function parseTrackingErrorHtml(
   const text=stripHtml(html);
 
   const sectionPos=
-    text.indexOf("Ö¸Êı»ù½ğÖ¸±ê");
+    text.indexOf("æŒ‡æ•°åŸºé‡‘æŒ‡æ ‡");
 
   const scope=
     sectionPos>=0
@@ -8058,17 +8024,17 @@ function parseTrackingErrorHtml(
         )
       :text;
 
-  // ±ØĞë´Ó¡°¸ú×ÙÖ¸Êı¡±µÄÊı¾İĞĞ¶ÁÈ¡µÚÒ»¸öÖ¸±ê¡£
+  // å¿…é¡»ä»â€œè·Ÿè¸ªæŒ‡æ•°â€çš„æ•°æ®è¡Œè¯»å–ç¬¬ä¸€ä¸ªæŒ‡æ ‡ã€‚
   //
-  // µäĞÍ±âÆ½ÎÄ±¾£º
-  // ¸ú×ÙÖ¸Êı Äê»¯¸ú×ÙÎó²î Í¬ÀàÆ½¾ù¸ú×ÙÎó²î
-  // ÄÉË¹´ï¿Ë100Ö¸Êı 1.66% 2.27%
+  // å…¸å‹æ‰å¹³æ–‡æœ¬ï¼š
+  // è·Ÿè¸ªæŒ‡æ•° å¹´åŒ–è·Ÿè¸ªè¯¯å·® åŒç±»å¹³å‡è·Ÿè¸ªè¯¯å·®
+  // çº³æ–¯è¾¾å…‹100æŒ‡æ•° 1.66% 2.27%
   //
-  // ¾É°æ´Ó¡°Äê»¯¸ú×ÙÎó²î¡±±êÌâÏòºóÕÒ°Ù·Ö±È£¬
-  // µ±»ù½ğ×ÔÉíÖµÎª -- / Ò³Ãæ½á¹¹ÌØÊâÊ±£¬¿ÉÄÜÎó×¥µÚ¶şÁĞ
-  // ¡°Í¬ÀàÆ½¾ù¸ú×ÙÎó²î¡±¡£
+  // æ—§ç‰ˆä»â€œå¹´åŒ–è·Ÿè¸ªè¯¯å·®â€æ ‡é¢˜å‘åæ‰¾ç™¾åˆ†æ¯”ï¼Œ
+  // å½“åŸºé‡‘è‡ªèº«å€¼ä¸º -- / é¡µé¢ç»“æ„ç‰¹æ®Šæ—¶ï¼Œå¯èƒ½è¯¯æŠ“ç¬¬äºŒåˆ—
+  // â€œåŒç±»å¹³å‡è·Ÿè¸ªè¯¯å·®â€ã€‚
   const rowMatch=scope.match(
-    /(?:ÄÉË¹´ï¿Ë\s*100\s*Ö¸Êı|NASDAQ\s*100(?:\s*INDEX)?)[^0-9%-]{0,80}(--|[0-9]+(?:\.[0-9]+)?\s*%)/i
+    /(?:çº³æ–¯è¾¾å…‹\s*100\s*æŒ‡æ•°|NASDAQ\s*100(?:\s*INDEX)?)[^0-9%-]{0,80}(--|[0-9]+(?:\.[0-9]+)?\s*%)/i
   );
 
   if(!rowMatch){
@@ -8103,7 +8069,7 @@ function parseTrackingErrorHtml(
   }
 
   const dateMatch=scope.match(
-    /½ØÖ¹ÖÁ[:£º]?\s*(20\d{2}-\d{2}-\d{2})/
+    /æˆªæ­¢è‡³[:ï¼š]?\s*(20\d{2}-\d{2}-\d{2})/
   );
 
   return {
@@ -8112,7 +8078,7 @@ function parseTrackingErrorHtml(
     trackingErrorDate:
       dateMatch?.[1]||null,
     trackingIndex:
-      "ÄÉË¹´ï¿Ë100Ö¸Êı"
+      "çº³æ–¯è¾¾å…‹100æŒ‡æ•°"
   };
 }
 
@@ -8163,19 +8129,20 @@ async function otcTrackingSummary({
     const cached=
       await loadTimedJsonCache(
         cacheKey,
-        24*3600*1000
+        36*3600*1000
       );
 
-    if(cached){
+    if(cached?.checkDate===shanghaiNowParts().date){
       return {
         ...cached,
-        servedFromCache:true
+        servedFromCache:true,
+        servedFromDailyCache:true
       };
     }
   }
 
-  // ÈÔÊ¹ÓÃ v3.17 µÄ¡°µ±Ç°Äê»¯¸ú×ÙÎó²î¡±ÌØÉ«Êı¾İ¿Ú¾¶¡£
-  // CNY / USD ·Ö²ğ£¬±ÜÃâÒ»´ÎĞÔ¶ÁÈ¡60¸öÒ³Ãæ¡£
+  // ä»ä½¿ç”¨ v3.17 çš„â€œå½“å‰å¹´åŒ–è·Ÿè¸ªè¯¯å·®â€ç‰¹è‰²æ•°æ®å£å¾„ã€‚
+  // CNY / USD åˆ†æ‹†ï¼Œé¿å…ä¸€æ¬¡æ€§è¯»å–60ä¸ªé¡µé¢ã€‚
   const rows=await mapLimit(
     metaList,
     6,
@@ -8212,6 +8179,7 @@ async function otcTrackingSummary({
   const result={
     generatedAt:
       new Date().toISOString(),
+    checkDate:shanghaiNowParts().date,
     currency:normalized,
     total:metaList.length,
     matched:rows.filter(
@@ -8232,7 +8200,7 @@ async function otcTrackingSummary({
       cachedAt:
         new Date().toISOString()
     },
-    24*3600
+    36*3600
   );
 
   return result;
@@ -8475,11 +8443,11 @@ export default {
         otcUsdFundCount:OTC_USD_META.length,
         qqqEnabled:true,
         sourcePriority:["Eastmoney","naKanban","HaoETF","cache"],
-        otcQuotaSource:"°²öÎÀÖQDII¶î¶ÈÈÕ±¨£¨Ö÷£©",
-        otcQuotaVerification:"»ù½ğ¹ÜÀíÈË¹«¸æÔ­ÎÄ£¨25´úÂë¼ì²é + partial/unverifiedÀúÊ·»ØËİ£©",
+        otcQuotaSource:"å®‰é‘«ä¹QDIIé¢åº¦æ—¥æŠ¥ï¼ˆä¸»ï¼‰",
+        otcQuotaVerification:"åŸºé‡‘ç®¡ç†äººå…¬å‘ŠåŸæ–‡ï¼ˆ25ä»£ç æ£€æŸ¥ + partial/unverifiedå†å²å›æº¯ï¼‰",
         otcEngineVersion:OTC_ENGINE_VERSION,
         otcFastLoad:true,
-        otcFeeSource:"ÌìÌì»ù½ğ/¶«·½²Æ¸»Choice",
+        otcFeeSource:"å¤©å¤©åŸºé‡‘/ä¸œæ–¹è´¢å¯ŒChoice",
         sharedCacheSeconds:20,
         historySourcePriority:["HaoETF direct history","Cloudflare D1 fallback"],
         historyStorage:"HaoETF direct + Cloudflare D1 fallback",
@@ -8566,15 +8534,46 @@ export default {
     }
 
     if (url.pathname === "/api/otc-funds") {
-      const forceRefresh=url.searchParams.get("refresh")==="1";
+      const refreshMode=otcV28RefreshMode(url);
+      const forceRefresh=refreshMode!=="daily";
       try {
+        if(!forceRefresh){
+          const daily=await readOtcDailyCacheV27(env);
+          if(daily){
+            return send(
+              {ok:true,...daily},
+              200,
+              "public, max-age=300"
+            );
+          }
+        }
+
+        const result=await buildOtcFundsHybridV37({
+          forceRefresh,
+          ctx
+        });
+
+        if(
+          !result.servedFromLastGood &&
+          Array.isArray(result.rows) &&
+          result.rows.length
+        ){
+          await writeOtcDailyCacheV27(
+            env,
+            result,
+            refreshMode
+          );
+        }
+
         return send(
           {
             ok:true,
-            ...await buildOtcFundsHybridV37({
-              forceRefresh,
-              ctx
-            })
+            ...result,
+            cacheInfo:getOtcCacheInfoV27(
+              env.DB?"D1":"Cache API",
+              result.generatedAt,
+              refreshMode
+            )
           },
           200,
           forceRefresh
@@ -8766,8 +8765,8 @@ export default {
   },
 
   async scheduled(controller, env, ctx) {
-    // ½¨Òé Cron: 5 7 * * 1-5
-    // Cloudflare Cron Ê¹ÓÃ UTC£¬¼´±±¾©Ê±¼ä¹¤×÷ÈÕ 15:05¡£
+    // å»ºè®® Cron: 5 7 * * 1-5
+    // Cloudflare Cron ä½¿ç”¨ UTCï¼Œå³åŒ—äº¬æ—¶é—´å·¥ä½œæ—¥ 15:05ã€‚
     ctx.waitUntil((async () => {
       try {
         await buildPremiums(env, {

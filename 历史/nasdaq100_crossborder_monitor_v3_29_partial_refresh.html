@@ -1929,16 +1929,11 @@ async function loadOtcNavSummary(force=false){
 
       return {
         ...r,
-        latestNav:
-          x.latestNav ?? r.latestNav,
-        latestNavDate:
-          x.latestNavDate ?? r.latestNavDate,
+        latestNav:x.latestNav,
+        latestNavDate:x.latestNavDate,
         latestDailyReturn:
-          x.latestDailyReturn ?? r.latestDailyReturn,
-        navYears:
-          Array.isArray(x.years)&&x.years.length
-            ?x.years
-            :(r.navYears||[])
+          x.latestDailyReturn,
+        navYears:x.years||[]
       };
     });
 
@@ -1998,11 +1993,11 @@ async function loadOtcTrackingSummary(
       return {
         ...r,
         trackingError:
-          x.trackingError ?? r.trackingError,
+          x.trackingError,
         trackingErrorDate:
-          x.trackingErrorDate ?? r.trackingErrorDate,
+          x.trackingErrorDate,
         trackingIndex:
-          x.trackingIndex ?? r.trackingIndex
+          x.trackingIndex
       };
     });
 
@@ -3909,40 +3904,15 @@ async function loadOtcUsdFunds(
 
     lastOtcUsdPayload=j;
 
-    const oldUsdRowMap=new Map(
-      otcRows
-        .filter(r=>r.currency==="USD")
-        .map(r=>[r.code,r])
-    );
-
     const usdCodes=new Set(
       (j.rows||[]).map(r=>r.code)
     );
-
-    const refreshedUsdRows=(j.rows||[]).map(r=>{
-      const old=oldUsdRowMap.get(r.code)||{};
-      return {
-        ...old,
-        ...r,
-        latestNav:r.latestNav ?? old.latestNav,
-        latestNavDate:r.latestNavDate ?? old.latestNavDate,
-        latestDailyReturn:
-          r.latestDailyReturn ?? old.latestDailyReturn,
-        navYears:r.navYears ?? old.navYears,
-        trackingError:
-          r.trackingError ?? old.trackingError,
-        trackingErrorDate:
-          r.trackingErrorDate ?? old.trackingErrorDate,
-        trackingIndex:
-          r.trackingIndex ?? old.trackingIndex
-      };
-    });
 
     otcRows=[
       ...otcRows.filter(
         r=>!usdCodes.has(r.code)
       ),
-      ...refreshedUsdRows
+      ...(j.rows||[])
     ];
 
     renderOtc();
@@ -4031,7 +4001,7 @@ async function loadOtcFunds(force=false){
     await loadOtcUsdFunds(force);
 
     // 手动按钮只强刷“额度与公告”。
-    // 净值和跟踪误差按上海自然日缓存，不随当天重复打开或手动额度刷新而强刷43个份额。
+    // 净值缓存2小时、跟踪误差缓存24小时，不随每次打开或手动刷新重复强刷43个份额。
     await Promise.all([
       loadOtcNavSummary(false),
       loadOtcTrackingSummary(false)
@@ -7026,9 +6996,11 @@ bindSortHeaders();
 bindOtcSortHeaders();
 switchView("etf");
 restoreOtcLocalSnapshot();
-// 页面启动时先完成场内行情请求，再预热场外数据。
-// 避免当天首次场外全量刷新与场内实时源争用 Worker 请求预算。
-loadPremiums().finally(()=>loadOtcFunds(false));
+loadPremiums();
+
+// 每次打开网页在后台预读场外数据，但优先使用 Worker 缓存。
+// 只有用户点击“刷新额度与公告”时才强制访问全部额度/公告上游。
+loadOtcFunds(false);
 })();
 </script>
 </body>
